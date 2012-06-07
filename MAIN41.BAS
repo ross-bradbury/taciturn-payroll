@@ -18,11 +18,11 @@ DECLARE FUNCTION Quit% (INI AS ANY)
 DEFINT A-Z
 DECLARE SUB DateAndTime ()
 DECLARE SUB Disk ()
-DECLARE SUB GetInputs (Old AS ANY, p AS ANY, Deductions() AS SINGLE)
+DECLARE SUB GetInputs (Old AS ANY, P AS ANY, Deductions() AS SINGLE)
 DECLARE SUB MainMenu (Version$)
 DECLARE SUB PayrollData (Mode%, RecNum%, Info AS ANY, FileName AS STRING, Year$)
-DECLARE SUB PrintPayStub (p AS ANY, Week%, x%)
-DECLARE SUB ScreenDisplay (p AS ANY)
+DECLARE SUB PrintPayStub (P AS ANY, Week%, x%)
+DECLARE SUB ScreenDisplay (P AS ANY)
 DECLARE SUB LastUsed (Mode!, INI AS ANY)
 DECLARE SUB Calculate (P1 AS ANY, Deductions() AS SINGLE, P2 AS ANY)
 DECLARE SUB Template (Period AS STRING, Week%, Employee AS ANY)
@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.33  (01-09-1999)"
+CONST Version$ = "2.34  (09-06-1999)"
+'New in v2.34: Stop Social Security deduction after base wage exceeded.
 'New in v2.32: Year selection for old records.
 'New in v2.33: 1999 Federal Tax Codes
 
@@ -247,6 +248,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   DIM tw AS SINGLE
   DIM TaxableGross AS SINGLE
   DIM PreTaxTotalDeductions AS SINGLE
+  DIM SSLimit AS DOUBLE
 
   P2.TotalDeduct = 0
 
@@ -315,8 +317,25 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   ' P2.Social = -Round(TaxableGross * .062, 2)
   ' P2.Medicare = -Round(TaxableGross * .0145, 2)
    
-    P2.Social = -Round(P2.Gross * .062, 2)
     P2.Medicare = -Round(P2.Gross * .0145, 2)
+   
+    'Social security has a wage base limit.  First we check to see if gross
+    'wages are above the limit, and then check to see if this is the pay
+    'period that puts is above the limit
+
+    SSLimit = 72600
+    IF P2.GrossYTD < SSLimit THEN
+        'Still below the limit, take SS tax on all of it
+        P2.Social = -Round(P2.Gross * .062, 2)
+    ELSE
+        IF P2.GrossYTD - P2.Gross > SSLimit THEN
+            'Over the limit before this pay period
+            P2.Social = 0
+        ELSE
+            'went over limit this pay period
+            P2.Social = -Round((SSLimit - (P2.GrossYTD - P2.Gross)) * .062, 2)
+        END IF
+    END IF
   ' ________________________________________________________________
 
   P2.SocialYTD = P1.SocialYTD + P2.Social
@@ -861,35 +880,35 @@ END SUB
 'GetInputs_________________________________________________________________SUB
 'Gets user inputs for new Week's Payroll
 '
-SUB GetInputs (Old AS PayrollType, p AS PayrollType, Deductions() AS SINGLE)
+SUB GetInputs (Old AS PayrollType, P AS PayrollType, Deductions() AS SINGLE)
   DIM DType(1 TO 4), AType(1 TO 4)
   DIM Active(1 TO 4)
 
 
-  DType(1) = p.Employee.Deduction1.DType
-  DType(2) = p.Employee.Deduction2.DType
-  DType(3) = p.Employee.Deduction3.DType
-  DType(4) = p.Employee.Deduction4.DType
-  AType(1) = p.Employee.Deduction1.AType
-  AType(2) = p.Employee.Deduction2.AType
-  AType(3) = p.Employee.Deduction3.AType
-  AType(4) = p.Employee.Deduction4.AType
-  Active(1) = p.Employee.Deduction1.Active
-  Active(2) = p.Employee.Deduction2.Active
-  Active(3) = p.Employee.Deduction3.Active
-  Active(4) = p.Employee.Deduction4.Active
+  DType(1) = P.Employee.Deduction1.DType
+  DType(2) = P.Employee.Deduction2.DType
+  DType(3) = P.Employee.Deduction3.DType
+  DType(4) = P.Employee.Deduction4.DType
+  AType(1) = P.Employee.Deduction1.AType
+  AType(2) = P.Employee.Deduction2.AType
+  AType(3) = P.Employee.Deduction3.AType
+  AType(4) = P.Employee.Deduction4.AType
+  Active(1) = P.Employee.Deduction1.Active
+  Active(2) = P.Employee.Deduction2.Active
+  Active(3) = P.Employee.Deduction3.Active
+  Active(4) = P.Employee.Deduction4.Active
 
   NextFlag = TRUE
 
   DO
-    CALL Calculate(Old, Deductions(), p)
-    CALL ScreenDisplay(p)
+    CALL Calculate(Old, Deductions(), P)
+    CALL ScreenDisplay(P)
 
     IF NextFlag = FALSE THEN EXIT DO
     IF NextFlag < 2 THEN CurField = CurField - NextFlag
     IF CurField < 1 THEN CurField = 9
     ' Salaried Employee
-    IF CurField > 1 AND CurField < 5 AND p.Employee.EmpType = 2 THEN CurField = CurField - NextFlag * 3
+    IF CurField > 1 AND CurField < 5 AND P.Employee.EmpType = 2 THEN CurField = CurField - NextFlag * 3
     ' Deductions
     DO
       Again = FALSE
@@ -905,31 +924,31 @@ SUB GetInputs (Old AS PayrollType, p AS PayrollType, Deductions() AS SINGLE)
    
     SELECT CASE CurField
       CASE 1
-        IF p.Employee.EmpType = 2 THEN
+        IF P.Employee.EmpType = 2 THEN
           LOCATE 7, 28
           PRINT "$";
-          p.RegularAMT = EditNum(p.RegularAMT, 5, 2, NextFlag)
+          P.RegularAMT = EditNum(P.RegularAMT, 5, 2, NextFlag)
           LOCATE 7, 28
-          PRINT USING "$$####.##"; p.RegularAMT
+          PRINT USING "$$####.##"; P.RegularAMT
         ELSE
           LOCATE 7, 21
-          p.RegularHRS = EditNum(p.RegularHRS, 2, 2, NextFlag)
+          P.RegularHRS = EditNum(P.RegularHRS, 2, 2, NextFlag)
         END IF
       CASE 2
         LOCATE 8, 21
-        p.OvertimeHRS = EditNum(p.OvertimeHRS, 2, 2, NextFlag)
+        P.OvertimeHRS = EditNum(P.OvertimeHRS, 2, 2, NextFlag)
       CASE 3
         LOCATE 9, 21
-        p.VacationHRS = EditNum(p.VacationHRS, 2, 2, NextFlag)
+        P.VacationHRS = EditNum(P.VacationHRS, 2, 2, NextFlag)
       CASE 4
         LOCATE 10, 21
-        p.HolidayHRS = EditNum(p.HolidayHRS, 2, 2, NextFlag)
+        P.HolidayHRS = EditNum(P.HolidayHRS, 2, 2, NextFlag)
       CASE 5
         LOCATE 11, 28
         PRINT "$";
-        p.BonusAMT = EditNum(p.BonusAMT, 5, 2, NextFlag)
+        P.BonusAMT = EditNum(P.BonusAMT, 5, 2, NextFlag)
         LOCATE 11, 28
-        PRINT USING "$$###.##"; p.BonusAMT
+        PRINT USING "$$###.##"; P.BonusAMT
       CASE 6 TO 9
         LOCATE 7 + CurField, 71
         IF AType(CurField - 5) = 1 THEN
@@ -1447,7 +1466,7 @@ END SUB
 'PrintPayStub______________________________________________________________SUB
 'Prints (x) copies of the Pay-Stub #2
 '
-SUB PrintPayStub (p AS PayrollType, Week, x)
+SUB PrintPayStub (P AS PayrollType, Week, x)
   SHARED Pref AS INITIALS
   STATIC CopiesPrinted
   DIM D(1 TO 4) AS PayrollDeductionType
@@ -1500,14 +1519,14 @@ SUB PrintPayStub (p AS PayrollType, Week, x)
   WH$(1) = "SINGLE"
   WH$(2) = "MARRIED"
 
-  Taxable(1) = p.Employee.Deduction1.Taxable
-  Taxable(2) = p.Employee.Deduction2.Taxable
-  Taxable(3) = p.Employee.Deduction3.Taxable
-  Taxable(4) = p.Employee.Deduction4.Taxable
-  D(1) = p.Deduction1
-  D(2) = p.Deduction2
-  D(3) = p.Deduction3
-  D(4) = p.Deduction4
+  Taxable(1) = P.Employee.Deduction1.Taxable
+  Taxable(2) = P.Employee.Deduction2.Taxable
+  Taxable(3) = P.Employee.Deduction3.Taxable
+  Taxable(4) = P.Employee.Deduction4.Taxable
+  D(1) = P.Deduction1
+  D(2) = P.Deduction2
+  D(3) = P.Deduction3
+  D(4) = P.Deduction4
 
   f = FREEFILE
   OPEN ShortString(Pref.PrintDev) FOR OUTPUT AS f
@@ -1533,7 +1552,7 @@ SUB PrintPayStub (p AS PayrollType, Week, x)
        PRINT #f,
       PRINT #f, "Social Security No. ";
        PRINT #m, UOn;
-       PRINT #f, USING "\         \"; p.Employee.Social;
+       PRINT #f, USING "\         \"; P.Employee.Social;
        PRINT #m, UOff;
        PRINT #f, SPACE$(12); "Week # ";
        PRINT #m, UOn;
@@ -1541,89 +1560,89 @@ SUB PrintPayStub (p AS PayrollType, Week, x)
        PRINT #m, UOff;
        PRINT #f, "    Period Ending ";
        PRINT #m, UOn;
-       PRINT #f, USING "\      \"; p.Period;
+       PRINT #f, USING "\      \"; P.Period;
        PRINT #m, UOff;
        PRINT #f,
       PRINT #f,
       PRINT #f, "Gross Pay ";
        PRINT #m, UOn;
-       PRINT #f, USING "$$####.##"; p.Gross;
+       PRINT #f, USING "$$####.##"; P.Gross;
        PRINT #m, UOff;
        PRINT #f, SPACE$(8); "Total Deductions ";
        PRINT #m, UOn;
-       PRINT #f, USING "$$####.##"; n * p.TotalDeduct;
+       PRINT #f, USING "$$####.##"; n * P.TotalDeduct;
        PRINT #m, UOff;
        PRINT #f, SPACE$(8); "Net Pay ";
        PRINT #m, UOn; TOn;
-       PRINT #f, USING "$$####.##"; p.NetPay;
+       PRINT #f, USING "$$####.##"; P.NetPay;
        PRINT #m, TOff; UOff
       PRINT #f, STRING$(80, 42)
       PRINT #f, "* Source of Gross * Units * Amounts *   Distributions    *   Y T D   * Current *"
       PRINT #f, "*-----------------*-------*---------*--------------------*-----------*---------*"
-      SELECT CASE p.Employee.EmpType
+      SELECT CASE P.Employee.EmpType
         CASE 2
           PRINT #f, "* Salary          * ----- *";
-           PRINT #f, USING "$$####.##"; p.RegularAMT;
+           PRINT #f, USING "$$####.##"; P.RegularAMT;
            PRINT #f, "* Gross Pay          *";
-           PRINT #f, USING "$$#####.##-"; p.GrossYTD;
+           PRINT #f, USING "$$#####.##-"; P.GrossYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.Gross;
+           PRINT #f, USING "$$####.##"; P.Gross;
            PRINT #f, "*"
           PRINT #f, "*                 *       *         * Social Security    *";
-           PRINT #f, USING "$$#####.##-"; n * p.SocialYTD;
+           PRINT #f, USING "$$#####.##-"; n * P.SocialYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; n * p.Social;
+           PRINT #f, USING "$$####.##"; n * P.Social;
            PRINT #f, "*"
           PRINT #f, "*                 *       *         * Medicare           *";
-           PRINT #f, USING "$$#####.##-"; n * p.MedicareYTD;
+           PRINT #f, USING "$$#####.##-"; n * P.MedicareYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; n * p.Medicare;
+           PRINT #f, USING "$$####.##"; n * P.Medicare;
            PRINT #f, "*"
           PRINT #f, "*                 *       *         ";
         CASE ELSE
           PRINT #f, "* Regular Hours   *";
-           PRINT #f, USING "###.##-"; p.RegularHRS;
+           PRINT #f, USING "###.##-"; P.RegularHRS;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.RegularAMT;
+           PRINT #f, USING "$$####.##"; P.RegularAMT;
            PRINT #f, "* Gross Pay "; TAB(58); "*";
-           PRINT #f, USING "$$#####.##-"; p.GrossYTD;
+           PRINT #f, USING "$$#####.##-"; P.GrossYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.Gross;
+           PRINT #f, USING "$$####.##"; P.Gross;
            PRINT #f, "*"
           PRINT #f, "* Overtime Hours  *";
-           PRINT #f, USING "###.##-"; p.OvertimeHRS;
+           PRINT #f, USING "###.##-"; P.OvertimeHRS;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.OvertimeAMT;
+           PRINT #f, USING "$$####.##"; P.OvertimeAMT;
            PRINT #f, "* Social Security "; TAB(58); "*";
-           PRINT #f, USING "$$#####.##-"; n * p.SocialYTD;
+           PRINT #f, USING "$$#####.##-"; n * P.SocialYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; n * p.Social;
+           PRINT #f, USING "$$####.##"; n * P.Social;
            PRINT #f, "*"
           PRINT #f, "* Vacation Hours  *";
-           PRINT #f, USING "###.##-"; p.VacationHRS;
+           PRINT #f, USING "###.##-"; P.VacationHRS;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.VacationAMT;
+           PRINT #f, USING "$$####.##"; P.VacationAMT;
            PRINT #f, "* Medicare "; TAB(58); "*";
-           PRINT #f, USING "$$#####.##-"; n * p.MedicareYTD;
+           PRINT #f, USING "$$#####.##-"; n * P.MedicareYTD;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; n * p.Medicare;
+           PRINT #f, USING "$$####.##"; n * P.Medicare;
            PRINT #f, "*"
           PRINT #f, "* Holiday Hours   *";
-           PRINT #f, USING "###.##-"; p.HolidayHRS;
+           PRINT #f, USING "###.##-"; P.HolidayHRS;
            PRINT #f, "*";
-           PRINT #f, USING "$$####.##"; p.HolidayAMT;
+           PRINT #f, USING "$$####.##"; P.HolidayAMT;
       END SELECT
           
        PRINT #f, "* U.S.Withholding TX"; TAB(58); "*";
-       PRINT #f, USING "$$#####.##-"; n * p.USWHYTD;
+       PRINT #f, USING "$$#####.##-"; n * P.USWHYTD;
        PRINT #f, "*";
-       PRINT #f, USING "$$####.##"; n * p.USWH;
+       PRINT #f, USING "$$####.##"; n * P.USWH;
        PRINT #f, "*"
       PRINT #f, "* Bonus           * ----- *";
-       PRINT #f, USING "$$####.##"; p.BonusAMT;
+       PRINT #f, USING "$$####.##"; P.BonusAMT;
        PRINT #f, "* Ohio in TX "; TAB(58); "*";
-       PRINT #f, USING "$$#####.##-"; n * p.OHWHYTD;
-       PRINT #f, "*"; : PRINT #f, USING "$$####.##"; n * p.OHWH;
+       PRINT #f, USING "$$#####.##-"; n * P.OHWHYTD;
+       PRINT #f, "*"; : PRINT #f, USING "$$####.##"; n * P.OHWH;
        PRINT #f, "*"
           
       FOR i = 1 TO 4
@@ -1650,11 +1669,11 @@ SUB PrintPayStub (p AS PayrollType, Week, x)
        PRINT #m, EOff;
        PRINT #f, "*";
        PRINT #m, EOn;
-       PRINT #f, USING "$$#####.##-"; n * p.TotalDeductYTD;
+       PRINT #f, USING "$$#####.##-"; n * P.TotalDeductYTD;
        PRINT #m, EOff;
        PRINT #f, "*";
        PRINT #m, EOn;
-       PRINT #f, USING "$$####.##"; n * p.TotalDeduct;
+       PRINT #f, USING "$$####.##"; n * P.TotalDeduct;
        PRINT #m, EOff;
        PRINT #f, "*"
       PRINT #f, "*                 *       *         * ";
@@ -1663,30 +1682,30 @@ SUB PrintPayStub (p AS PayrollType, Week, x)
        PRINT #m, EOff;
        PRINT #f, "*";
        PRINT #m, EOn;
-       PRINT #f, USING "$$#####.##-"; p.NetPayYTD;
+       PRINT #f, USING "$$#####.##-"; P.NetPayYTD;
        PRINT #m, EOff;
        PRINT #f, "*";
        PRINT #m, EOn;
-       PRINT #f, USING "$$####.##"; p.NetPay;
+       PRINT #f, USING "$$####.##"; P.NetPay;
        PRINT #m, EOff;
        PRINT #f, "*"
       PRINT #f, STRING$(80, 42)
      
-      IF p.Employee.USAllowances = 15 THEN
+      IF P.Employee.USAllowances = 15 THEN
           ' Special Tax Rates
           PRINT #f, " *U.S. W/H =  15% of Taxable Gross"
           PRINT #f, " *Ohio W/H = 3.5% of Taxable Gross"
       ELSE
-          PRINT #f, " *U.S. W/H = "; WH$(p.Employee.USHolding); " with"; p.Employee.USAllowances; "ALLOWANCES"
-          PRINT #f, " *Ohio W/H = "; WH$(p.Employee.OHHolding); " with"; p.Employee.OHAllowances; "ALLOWANCES"
+          PRINT #f, " *U.S. W/H = "; WH$(P.Employee.USHolding); " with"; P.Employee.USAllowances; "ALLOWANCES"
+          PRINT #f, " *Ohio W/H = "; WH$(P.Employee.OHHolding); " with"; P.Employee.OHAllowances; "ALLOWANCES"
       END IF
      
       PRINT #m, EOn;
-      PRINT #f, p.Employee.Note;
+      PRINT #f, P.Employee.Note;
       PRINT #m, EOff
-      PRINT #f, " "; p.Employee.EmpName
-      PRINT #f, " "; p.Employee.Address
-      PRINT #f, " "; ShortString(p.Employee.Town); ", "; p.Employee.State; " "; p.Employee.Zip;
+      PRINT #f, " "; P.Employee.EmpName
+      PRINT #f, " "; P.Employee.Address
+      PRINT #f, " "; ShortString(P.Employee.Town); ", "; P.Employee.State; " "; P.Employee.Zip;
      
       IF CopiesPrinted MOD 2 THEN
         PRINT #f,
@@ -1957,7 +1976,7 @@ END FUNCTION
 'ScreenDisplay_____________________________________________________________SUB
 'Displays Paystub
 '
-SUB ScreenDisplay (p AS PayrollType)
+SUB ScreenDisplay (P AS PayrollType)
   SHARED Pref AS INITIALS
   DIM D(1 TO 4) AS DeductionType
   DIM PD(1 TO 4) AS PayrollDeductionType
@@ -1969,21 +1988,21 @@ SUB ScreenDisplay (p AS PayrollType)
   END IF
  
   LOCATE 3, 11
-    PRINT USING "$$####.##"; p.Gross;
+    PRINT USING "$$####.##"; P.Gross;
     LOCATE 3, 44
-    PRINT USING "$$####.##"; n * p.TotalDeduct;
+    PRINT USING "$$####.##"; n * P.TotalDeduct;
     LOCATE 3, 72
-    PRINT USING "$$####.##"; p.NetPay
+    PRINT USING "$$####.##"; P.NetPay
 
   'Fill In Template_____________________________________________________________
-  SELECT CASE p.Employee.EmpType
+  SELECT CASE P.Employee.EmpType
   CASE 2
      LOCATE 7, 3
      PRINT "Seven Days"
      LOCATE 7, 21
      PRINT "ÄÄÄÄÄ"
      LOCATE 7, 28
-     PRINT USING "$$####.##"; p.RegularAMT
+     PRINT USING "$$####.##"; P.RegularAMT
   CASE 1, 3
      LOCATE 7, 3
      PRINT "Regular Hours"
@@ -1996,91 +2015,91 @@ SUB ScreenDisplay (p AS PayrollType)
     
      COLOR Pref.Entry
      LOCATE 7, 20
-     PRINT USING "###.##"; p.RegularHRS
+     PRINT USING "###.##"; P.RegularHRS
      LOCATE 8, 20
-     PRINT USING "###.##"; p.OvertimeHRS
+     PRINT USING "###.##"; P.OvertimeHRS
      LOCATE 9, 20
-     PRINT USING "###.##"; p.VacationHRS
+     PRINT USING "###.##"; P.VacationHRS
      LOCATE 10, 20
-     PRINT USING "###.##"; p.HolidayHRS
+     PRINT USING "###.##"; P.HolidayHRS
     
      COLOR Pref.Fore
      LOCATE 7, 28
-     PRINT USING "$$####.##"; p.RegularAMT
+     PRINT USING "$$####.##"; P.RegularAMT
      LOCATE 8, 28
-     PRINT USING "$$####.##"; p.OvertimeAMT
+     PRINT USING "$$####.##"; P.OvertimeAMT
      LOCATE 9, 28
-     PRINT USING "$$####.##"; p.VacationAMT
+     PRINT USING "$$####.##"; P.VacationAMT
      LOCATE 10, 28
-     PRINT USING "$$####.##"; p.HolidayAMT
+     PRINT USING "$$####.##"; P.HolidayAMT
   END SELECT
  
   COLOR Pref.Entry
   LOCATE 11, 28
-  PRINT USING "$$####.##"; p.BonusAMT
+  PRINT USING "$$####.##"; P.BonusAMT
   COLOR Pref.Fore
 
   'YTD__________________________________________________________________________
   LOCATE 7, 59
-  PRINT USING "$$#####.##"; p.GrossYTD
+  PRINT USING "$$#####.##"; P.GrossYTD
   LOCATE 8, 59
-  PRINT USING "$$#####.##"; n * p.SocialYTD
+  PRINT USING "$$#####.##"; n * P.SocialYTD
   LOCATE 9, 59
-  PRINT USING "$$#####.##"; n * p.MedicareYTD
+  PRINT USING "$$#####.##"; n * P.MedicareYTD
   LOCATE 10, 59
-  PRINT USING "$$#####.##"; n * p.USWHYTD
+  PRINT USING "$$#####.##"; n * P.USWHYTD
   LOCATE 11, 59
-  PRINT USING "$$#####.##"; n * p.OHWHYTD
+  PRINT USING "$$#####.##"; n * P.OHWHYTD
   LOCATE 17, 59
-  PRINT USING "$$#####.##"; n * p.TotalDeductYTD
+  PRINT USING "$$#####.##"; n * P.TotalDeductYTD
   LOCATE 18, 59
-  PRINT USING "$$#####.##"; p.NetPayYTD
+  PRINT USING "$$#####.##"; P.NetPayYTD
   'Current______________________________________________________________________
   LOCATE 7, 71
-  PRINT USING "$$####.##"; p.Gross
+  PRINT USING "$$####.##"; P.Gross
   LOCATE 8, 71
-  PRINT USING "$$####.##"; n * p.Social
+  PRINT USING "$$####.##"; n * P.Social
   LOCATE 9, 71
-  PRINT USING "$$####.##"; n * p.Medicare
+  PRINT USING "$$####.##"; n * P.Medicare
   LOCATE 10, 71
-  PRINT USING "$$####.##"; n * p.USWH
+  PRINT USING "$$####.##"; n * P.USWH
   LOCATE 11, 71
-  PRINT USING "$$####.##"; n * p.OHWH
+  PRINT USING "$$####.##"; n * P.OHWH
   LOCATE 17, 71
-  PRINT USING "$$####.##"; n * p.TotalDeduct
+  PRINT USING "$$####.##"; n * P.TotalDeduct
   LOCATE 18, 71
-  PRINT USING "$$####.##"; p.NetPay
+  PRINT USING "$$####.##"; P.NetPay
   'Earnings_____________________________________________________________________
   LOCATE 15, 20
-  PRINT USING "####.##"; p.RegYTDHRS
+  PRINT USING "####.##"; P.RegYTDHRS
   LOCATE 16, 20
-  PRINT USING "####.##"; p.OvrYTDHRS
+  PRINT USING "####.##"; P.OvrYTDHRS
   LOCATE 17, 20
-  PRINT USING "####.##"; p.VacYTDHRS
+  PRINT USING "####.##"; P.VacYTDHRS
   LOCATE 18, 20
-  PRINT USING "####.##"; p.HolYTDHRS
+  PRINT USING "####.##"; P.HolYTDHRS
   LOCATE 19, 20
   PRINT " ÄÄÄÄÄ"
   LOCATE 15, 28
-  PRINT USING "$$####.##"; p.RegYTDAMT
+  PRINT USING "$$####.##"; P.RegYTDAMT
   LOCATE 16, 28
-  PRINT USING "$$####.##"; p.OvrYTDAMT
+  PRINT USING "$$####.##"; P.OvrYTDAMT
   LOCATE 17, 28
-  PRINT USING "$$####.##"; p.VacYTDAMT
+  PRINT USING "$$####.##"; P.VacYTDAMT
   LOCATE 18, 28
-  PRINT USING "$$####.##"; p.HolYTDAMT
+  PRINT USING "$$####.##"; P.HolYTDAMT
   LOCATE 19, 28
-  PRINT USING "$$####.##"; p.BonusYTD
+  PRINT USING "$$####.##"; P.BonusYTD
 
   'Extra deductions_____________________________________________________________
-  D(1) = p.Employee.Deduction1
-  D(2) = p.Employee.Deduction2
-  D(3) = p.Employee.Deduction3
-  D(4) = p.Employee.Deduction4
-  PD(1) = p.Deduction1
-  PD(2) = p.Deduction2
-  PD(3) = p.Deduction3
-  PD(4) = p.Deduction4
+  D(1) = P.Employee.Deduction1
+  D(2) = P.Employee.Deduction2
+  D(3) = P.Employee.Deduction3
+  D(4) = P.Employee.Deduction4
+  PD(1) = P.Deduction1
+  PD(2) = P.Deduction2
+  PD(3) = P.Deduction3
+  PD(4) = P.Deduction4
                               
   FOR i = 1 TO 4
     IF D(i).Active THEN
@@ -2098,7 +2117,7 @@ SUB ScreenDisplay (p AS PayrollType)
 
   IF EmpType$ <> "SALARY" THEN
      LOCATE 19, 39
-     PRINT USING "$$###.##"; p.Employee.Wage; : PRINT "/Hour";
+     PRINT USING "$$###.##"; P.Employee.Wage; : PRINT "/Hour";
   END IF
 
 END SUB
