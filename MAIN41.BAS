@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.36  (01-01-2001)"
+CONST Version$ = "2.37  (07-04-2001)"
+'New in v2.37: 2001 Federal Tax Law changed
 'New in v2.36: 2001 Federal Tax Codes (01-01-2001)
 'New in v2.35: 2000 Federal Tax Codes (01-05-2000)
 'New in v2.34: Stop Social Security deduction after base wage exceeded.
@@ -393,13 +394,13 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 552
             P2.USWH = ((tw - 51) * .15)
           CASE IS <= 1196
-            P2.USWH = (((tw - 552) * .28) + 75.15)
+            P2.USWH = (((tw - 552) * .27) + 75.15)
           CASE IS <= 2662
-            P2.USWH = (((tw - 1196) * .31) + 255.47)
+            P2.USWH = (((tw - 1196) * .3) + 249.03)
           CASE IS <= 5750
-            P2.USWH = (((tw - 2662) * .36) + 709.93)
+            P2.USWH = (((tw - 2662) * .35) + 688.83)
           CASE IS > 5750
-            P2.USWH = (((tw - 5750) * .396) + 1821.61)
+            P2.USWH = (((tw - 5750) * .386) + 1769.63)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
@@ -409,13 +410,13 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 960
             P2.USWH = ((tw - 124) * .15)
           CASE IS <= 2023
-            P2.USWH = (((tw - 960) * .28) + 125.4)
+            P2.USWH = (((tw - 960) * .27) + 125.4)
           CASE IS <= 3292
-            P2.USWH = (((tw - 2023) * .31) + 423.04)
+            P2.USWH = (((tw - 2023) * .3) + 412.41)
           CASE IS <= 5809
-            P2.USWH = (((tw - 3292) * .36) + 814.43)
+            P2.USWH = (((tw - 3292) * .35) + 793.11)
           CASE IS > 5809
-            P2.USWH = (((tw - 5809) * .396) + 1722.55)
+            P2.USWH = (((tw - 5809) * .386) + 1674.06)
         END SELECT
       END IF
   END IF
