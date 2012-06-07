@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.39  (01-11-2003)"
+CONST Version$ = "2.40  (07-20-2003)"
+'New in v2.40: 2003 Federal Tax Codes (07-20-2003), Publication 15-T
 'New in v2.39: 2003 Federal Tax Codes (01-11-2003), new SSLimit, bonus mode
 ' reduced to 10% taxable gross for federal
 'New in v2.38: 2002 Federal Tax Codes (01-20-2002)
@@ -382,7 +383,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
        
   ' Federal Withholding ---------------------------------------Calculation--
  
-  ' tax codes Rev. January 2002
+  ' tax codes Rev. July 2003
 
   IF GlobalDeductionBonus = TRUE THEN
      
@@ -392,42 +393,42 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 57.69 * P2.Employee.USAllowances
+      tw = TaxableGross - 59.62 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 51
             P2.USWH = 0
-          CASE IS <= 164
+          CASE IS <= 187
             P2.USWH = ((tw - 51) * .1)
-          CASE IS <= 579
-            P2.USWH = (((tw - 164) * .15) + 11.3)
-          CASE IS <= 1268
-            P2.USWH = (((tw - 579) * .27) + 73.55)
-          CASE IS <= 2792
-            P2.USWH = (((tw - 1268) * .3) + 259.58)
-          CASE IS <= 6032
-            P2.USWH = (((tw - 2792) * .35) + 716.78)
-          CASE IS > 6032
-            P2.USWH = (((tw - 6032) * .386) + 1850.78)
+          CASE IS <= 592
+            P2.USWH = (((tw - 187) * .15) + 13.6)
+          CASE IS <= 1317
+            P2.USWH = (((tw - 592) * .25) + 74.35)
+          CASE IS <= 2860
+            P2.USWH = (((tw - 1317) * .28) + 255.6)
+          CASE IS <= 6177
+            P2.USWH = (((tw - 2860) * .33) + 687.64)
+          CASE IS > 6177
+            P2.USWH = (((tw - 6177) * .35) + 1782.25)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 124
+          CASE IS <= 154
             P2.USWH = 0
-          CASE IS <= 355
-            P2.USWH = ((tw - 124) * .1)
-          CASE IS <= 1007
-            P2.USWH = (((tw - 355) * .15) + 23.1)
-          CASE IS <= 2150
-            P2.USWH = (((tw - 1007) * .27) + 120.9)
-          CASE IS <= 3454
-            P2.USWH = (((tw - 2150) * .3) + 429.51)
-          CASE IS <= 6093
-            P2.USWH = (((tw - 3454) * .35) + 820.71)
-          CASE IS > 6093
-            P2.USWH = (((tw - 6093) * .386) + 1744.36)
+          CASE IS <= 429
+            P2.USWH = ((tw - 154) * .1)
+          CASE IS <= 1245
+            P2.USWH = (((tw - 429) * .15) + 27.5)
+          CASE IS <= 2270
+            P2.USWH = (((tw - 1245) * .25) + 149.9)
+          CASE IS <= 3568
+            P2.USWH = (((tw - 2270) * .28) + 406.15)
+          CASE IS <= 6271
+            P2.USWH = (((tw - 3568) * .33) + 769.59)
+          CASE IS > 6271
+            P2.USWH = (((tw - 6271) * .35) + 1661.58)
         END SELECT
       END IF
   END IF
