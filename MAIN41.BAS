@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.37  (07-04-2001)"
+CONST Version$ = "2.38  (01-20-2002)"
+'New in v2.38: 2002 Federal Tax Codes (01-20-2002)
 'New in v2.37: 2001 Federal Tax Law changed
 'New in v2.36: 2001 Federal Tax Codes (01-01-2001)
 'New in v2.35: 2000 Federal Tax Codes (01-05-2000)
@@ -378,45 +379,49 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
        
   ' Federal Withholding ---------------------------------------Calculation--
  
-  ' tax codes Rev. January 1999
+  ' tax codes Rev. January 2002
 
   IF GlobalDeductionBonus = TRUE THEN
      
       ' For special tax rate, use 15% Taxable Gross
       P2.USWH = .15 * TaxableGross
   ELSE
-      tw = TaxableGross - 55.77 * P2.Employee.USAllowances
+      tw = TaxableGross - 57.69 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 51
             P2.USWH = 0
-          CASE IS <= 552
-            P2.USWH = ((tw - 51) * .15)
-          CASE IS <= 1196
-            P2.USWH = (((tw - 552) * .27) + 75.15)
-          CASE IS <= 2662
-            P2.USWH = (((tw - 1196) * .3) + 249.03)
-          CASE IS <= 5750
-            P2.USWH = (((tw - 2662) * .35) + 688.83)
-          CASE IS > 5750
-            P2.USWH = (((tw - 5750) * .386) + 1769.63)
+          CASE IS <= 164
+            P2.USWH = ((tw - 51) * .1)
+          CASE IS <= 570
+            P2.USWH = (((tw - 164) * .15) + 11.3)
+          CASE IS <= 1247
+            P2.USWH = (((tw - 570) * .27) + 72.2)
+          CASE IS <= 2749
+            P2.USWH = (((tw - 1247) * .3) + 254.99)
+          CASE IS <= 5938
+            P2.USWH = (((tw - 2749) * .35) + 705.59)
+          CASE IS > 5938
+            P2.USWH = (((tw - 5938) * .386) + 1821.74)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 124
             P2.USWH = 0
-          CASE IS <= 960
-            P2.USWH = ((tw - 124) * .15)
-          CASE IS <= 2023
-            P2.USWH = (((tw - 960) * .27) + 125.4)
-          CASE IS <= 3292
-            P2.USWH = (((tw - 2023) * .3) + 412.41)
-          CASE IS <= 5809
-            P2.USWH = (((tw - 3292) * .35) + 793.11)
-          CASE IS > 5809
-            P2.USWH = (((tw - 5809) * .386) + 1674.06)
+          CASE IS <= 355
+            P2.USWH = ((tw - 124) * .1)
+          CASE IS <= 991
+            P2.USWH = (((tw - 355) * .15) + 23.1)
+          CASE IS <= 2110
+            P2.USWH = (((tw - 991) * .27) + 118.5)
+          CASE IS <= 3400
+            P2.USWH = (((tw - 2110) * .3) + 420.63)
+          CASE IS <= 5998
+            P2.USWH = (((tw - 3400) * .35) + 807.63)
+          CASE IS > 5998
+            P2.USWH = (((tw - 5998) * .386) + 1716.93)
         END SELECT
       END IF
   END IF
