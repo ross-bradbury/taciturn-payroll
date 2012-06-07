@@ -105,10 +105,12 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.34  (09-06-1999)"
+CONST Version$ = "2.36  (01-01-2001)"
+'New in v2.36: 2001 Federal Tax Codes (01-01-2001)
+'New in v2.35: 2000 Federal Tax Codes (01-05-2000)
 'New in v2.34: Stop Social Security deduction after base wage exceeded.
-'New in v2.32: Year selection for old records.
 'New in v2.33: 1999 Federal Tax Codes
+'New in v2.32: Year selection for old records.
 
 
 SCREEN 0, 1, 0, 0
@@ -323,7 +325,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     'wages are above the limit, and then check to see if this is the pay
     'period that puts is above the limit
 
-    SSLimit = 72600
+    SSLimit = 80400
     IF P2.GrossYTD < SSLimit THEN
         'Still below the limit, take SS tax on all of it
         P2.Social = -Round(P2.Gross * .062, 2)
@@ -382,38 +384,38 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       ' For special tax rate, use 15% Taxable Gross
       P2.USWH = .15 * TaxableGross
   ELSE
-      tw = TaxableGross - 52.88 * P2.Employee.USAllowances
+      tw = TaxableGross - 55.77 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 51
             P2.USWH = 0
-          CASE IS <= 525
+          CASE IS <= 552
             P2.USWH = ((tw - 51) * .15)
-          CASE IS <= 1125
-            P2.USWH = (((tw - 525) * .28) + 71.1)
-          CASE IS <= 2535
-            P2.USWH = (((tw - 1125) * .31) + 239.1)
-          CASE IS <= 5475
-            P2.USWH = (((tw - 2535) * .36) + 676.2)
-          CASE IS > 5475
-            P2.USWH = (((tw - 5475) * .396) + 1734.6)
+          CASE IS <= 1196
+            P2.USWH = (((tw - 552) * .28) + 75.15)
+          CASE IS <= 2662
+            P2.USWH = (((tw - 1196) * .31) + 255.47)
+          CASE IS <= 5750
+            P2.USWH = (((tw - 2662) * .36) + 709.93)
+          CASE IS > 5750
+            P2.USWH = (((tw - 5750) * .396) + 1821.61)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 124
             P2.USWH = 0
-          CASE IS <= 913
+          CASE IS <= 960
             P2.USWH = ((tw - 124) * .15)
-          CASE IS <= 1894
-            P2.USWH = (((tw - 913) * .28) + 118.35)
-          CASE IS <= 3135
-            P2.USWH = (((tw - 1894) * .31) + 393.03)
-          CASE IS <= 5531
-            P2.USWH = (((tw - 3135) * .36) + 777.74)
-          CASE IS > 5531
-            P2.USWH = (((tw - 5531) * .396) + 1640.3)
+          CASE IS <= 2023
+            P2.USWH = (((tw - 960) * .28) + 125.4)
+          CASE IS <= 3292
+            P2.USWH = (((tw - 2023) * .31) + 423.04)
+          CASE IS <= 5809
+            P2.USWH = (((tw - 3292) * .36) + 814.43)
+          CASE IS > 5809
+            P2.USWH = (((tw - 5809) * .396) + 1722.55)
         END SELECT
       END IF
   END IF
