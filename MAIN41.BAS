@@ -105,9 +105,10 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.49  (12-27-2011)"
-'New in v2.49: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
-'New in v2.48: 2011 4.2% social security & Federal Tax Codes (Dec 29, 2010 http://www.irs.gov/pub/irs-pdf/p15.pdf
+CONST Version$ = "2.50  (01-05-2013)"
+'New in v2.50 2013-01-05: 6.2% social security & federal tax codes from Notice 1036 (Rev. January 2013) http://www.irs.gov/pub/irs-pdf/n1036.pdf
+'New in v2.49 2011-12-27: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
+'New in v2.48 2011-01-09: 2011 4.2% social security & Federal Tax Codes (Dec 29, 2010 http://www.irs.gov/pub/irs-pdf/p15.pdf
 'New in v2.47: 2009 Federal Tax Codes (04-11-2009), Publication 15-T (03-02-2009)
 'New in v2.46: 2009 Federal Tax Codes (01-11-2009), Publication 15
 '              2009 Ohio State Tax Codes (01-11-2009)
@@ -268,7 +269,6 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   DIM tw AS SINGLE
   DIM TaxableGross AS SINGLE
   DIM PreTaxTotalDeductions AS SINGLE
-  DIM SSLimit AS DOUBLE
   CONST PP = 52
 
   P2.TotalDeduct = 0
@@ -333,10 +333,6 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
 
 
   TaxableGross = P2.Gross + PreTaxTotalDeductions
-
-  ' Calculate Social Security and Medicare from TRUE Gross Pay _____
-  ' P2.Social = -Round(TaxableGross * .042, 2)
-  ' P2.Medicare = -Round(TaxableGross * .0145, 2)
    
     P2.Medicare = -Round(P2.Gross * .0145, 2)
    
@@ -344,6 +340,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     'wages are above the limit, and then check to see if this is the pay
     'period that puts is above the limit
 
+    ' 2013-01-05 - Employee rate changed from .042 to .062 and limit increased to 113700
     ' 2011-01-09 - Employee rate changed from .062 to .042 and limit stays at 106800
     ' 2009-01-11 - SSLimit increased to 106800 from 102000
     ' 2008-04-13 - SSLimit increased to 102000 from 97500
@@ -352,17 +349,20 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     ' 2005-01-09 - SSLimit increased to 90000 from 87900
     ' 2004-02-20 - SSLimit increased to 87900 from 87000
     ' 2003-01-11 - SSLimit increased to 87000 from 84900
-    SSLimit = 106800
+    DIM SSRate AS DOUBLE
+    SSRate = .062
+    DIM SSLimit AS DOUBLE
+    SSLimit = 113700
     IF P2.GrossYTD < SSLimit THEN
         'Still below the limit, take SS tax on all of it
-        P2.Social = -Round(P2.Gross * .042, 2)
+        P2.Social = -Round(P2.Gross * SSRate, 2)
     ELSE
         IF P2.GrossYTD - P2.Gross > SSLimit THEN
             'Over the limit before this pay period
             P2.Social = 0
         ELSE
             'went over limit this pay period
-            P2.Social = -Round((SSLimit - (P2.GrossYTD - P2.Gross)) * .042, 2)
+            P2.Social = -Round((SSLimit - (P2.GrossYTD - P2.Gross)) * SSRate, 2)
         END IF
     END IF
   ' ________________________________________________________________
@@ -406,8 +406,8 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
        
   ' Federal Withholding ---------------------------------------Calculation--
  
-  ' tax codes Rev. MAR 2009
-
+  ' tax codes Rev. 5-JAN-2013
+ 
   IF GlobalDeductionBonus = TRUE THEN
      
       ' For special tax rate, use 15% Taxable Gross
@@ -416,42 +416,46 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 71.15 * P2.Employee.USAllowances
+      tw = TaxableGross - 75.00 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 40
+          CASE IS <= 42
             P2.USWH = 0
-          CASE IS <= 204
-            P2.USWH = ((tw - 40) * .1)
-          CASE IS <= 704
-            P2.USWH = (((tw - 204) * .15) + 16.4)
-          CASE IS <= 1648
-            P2.USWH = (((tw - 704) * .25) + 91.4)
-          CASE IS <= 3394
-            P2.USWH = (((tw - 1648) * .28) + 327.4)
-          CASE IS <= 7332
-            P2.USWH = (((tw - 3394) * .33) + 816.28)
-           CASE IS > 7332
-            P2.USWH = (((tw - 7332) * .35) + 2115.82)
+          CASE IS <= 214
+            P2.USWH = ((tw - 42) * .1)
+          CASE IS <= 739
+            P2.USWH = (((tw - 214) * .15) + 17.20)
+          CASE IS <= 1732
+            P2.USWH = (((tw - 739) * .25) + 95.95)
+          CASE IS <= 3566
+            P2.USWH = (((tw - 1732) * .28) + 344.20)
+          CASE IS <= 7703
+            P2.USWH = (((tw - 3566) * .33) + 857.72)
+           CASE IS <= 7735
+            P2.USWH = (((tw - 7703) * .35) + 2222.93)
+           CASE IS > 7735
+            P2.USWH = (((tw - 7735) * .396) + 2234.13)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 152
+          CASE IS <= 160
             P2.USWH = 0
-          CASE IS <= 479
-            P2.USWH = ((tw - 152) * .1)
-          CASE IS <= 1479
-            P2.USWH = (((tw - 479) * .15) + 32.7)
-          CASE IS <= 2832
-            P2.USWH = (((tw - 1479) * .25) + 182.7)
-          CASE IS <= 4235
-            P2.USWH = (((tw - 2832) * .28) + 520.95)
-          CASE IS <= 7443
-            P2.USWH = (((tw - 4235) * .33) + 913.79)
-          CASE IS > 7443
-            P2.USWH = (((tw - 7443) * .35) + 1972.43)
+          CASE IS <= 503
+            P2.USWH = ((tw - 160) * .1)
+          CASE IS <= 1554
+            P2.USWH = (((tw - 503) * .15) + 34.30)
+          CASE IS <= 2975
+            P2.USWH = (((tw - 1554) * .25) + 191.95)
+          CASE IS <= 4449
+            P2.USWH = (((tw - 2975) * .28) + 547.20)
+          CASE IS <= 7820
+            P2.USWH = (((tw - 4449) * .33) + 959.92)
+          CASE IS <= 8813
+            P2.USWH = (((tw - 7820) * .35) + 2072.35)
+          CASE IS > 8813
+            P2.USWH = (((tw - 8813) * .396) + 2419.90)
         END SELECT
       END IF
   END IF
