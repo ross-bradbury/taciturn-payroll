@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.50  (01-05-2013)"
+CONST Version$ = "2.51  (09-14-2013)"
+'New in v2.51 2013-09-14: Changed state witholding
 'New in v2.50 2013-01-05: 6.2% social security & federal tax codes from Notice 1036 (Rev. January 2013) http://www.irs.gov/pub/irs-pdf/n1036.pdf
 'New in v2.49 2011-12-27: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
 'New in v2.48 2011-01-09: 2011 4.2% social security & Federal Tax Codes (Dec 29, 2010 http://www.irs.gov/pub/irs-pdf/p15.pdf
@@ -372,7 +373,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   P2.TotalDeduct = P2.TotalDeduct + P2.Social + P2.Medicare
  
   ' State Withholding -----------------------------------------Calculation--
-  CONST StateMultiplier = 1.276
+  CONST StateMultiplier = 1.161
 
 '  IF P2.Employee.OHAllowances = 15 THEN
   IF GlobalDeductionBonus = TRUE THEN
