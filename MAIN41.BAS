@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.46  (01-11-2009)"
+CONST Version$ = "2.47  (04-11-2009)"
+'New in v2.47: 2009 Federal Tax Codes (04-11-2009), Publication 15-T (03-02-2009)
 'New in v2.46: 2009 Federal Tax Codes (01-11-2009), Publication 15
 '              2009 Ohio State Tax Codes (01-11-2009)
 'New in v2.45: 2008 Federal Tax Codes (04-13-2008), Publication 15
@@ -402,7 +403,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
        
   ' Federal Withholding ---------------------------------------Calculation--
  
-  ' tax codes Rev. JAN 2009
+  ' tax codes Rev. MAR 2009
 
   IF GlobalDeductionBonus = TRUE THEN
      
@@ -416,38 +417,38 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 51
+          CASE IS <= 138
             P2.USWH = 0
           CASE IS <= 200
-            P2.USWH = ((tw - 51) * .1)
-          CASE IS <= 681
-            P2.USWH = (((tw - 200) * .15) + 14.9)
-          CASE IS <= 1621
-            P2.USWH = (((tw - 681) * .25) + 87.05)
+            P2.USWH = ((tw - 138) * .1)
+          CASE IS <= 696
+            P2.USWH = (((tw - 200) * .15) + 6.2)
+          CASE IS <= 1279
+            P2.USWH = (((tw - 696) * .25) + 80.6)
           CASE IS <= 3338
-            P2.USWH = (((tw - 1621) * .28) + 322.05)
+            P2.USWH = (((tw - 1279) * .28) + 226.35)
           CASE IS <= 7212
-            P2.USWH = (((tw - 3338) * .33) + 802.81)
-          CASE IS > 7212
-            P2.USWH = (((tw - 7212) * .35) + 2081.23)
+            P2.USWH = (((tw - 3338) * .33) + 802.87)
+           CASE IS > 7212
+            P2.USWH = (((tw - 7212) * .35) + 2081.29)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 154
+          CASE IS <= 303
             P2.USWH = 0
-          CASE IS <= 461
-            P2.USWH = ((tw - 154) * .1)
+          CASE IS <= 470
+            P2.USWH = ((tw - 303) * .1)
           CASE IS <= 1455
-            P2.USWH = (((tw - 461) * .15) + 30.7)
-          CASE IS <= 2785
-            P2.USWH = (((tw - 1455) * .25) + 179.8)
+            P2.USWH = (((tw - 470) * .15) + 16.7)
+          CASE IS <= 2272
+            P2.USWH = (((tw - 1455) * .25) + 164.45)
           CASE IS <= 4165
-            P2.USWH = (((tw - 2785) * .28) + 512.3)
+            P2.USWH = (((tw - 2272) * .28) + 368.7)
           CASE IS <= 7321
-            P2.USWH = (((tw - 4165) * .33) + 898.7)
+            P2.USWH = (((tw - 4165) * .33) + 898.74)
           CASE IS > 7321
-            P2.USWH = (((tw - 7321) * .35) + 1940.18)
+            P2.USWH = (((tw - 7321) * .35) + 1940.22)
         END SELECT
       END IF
   END IF
