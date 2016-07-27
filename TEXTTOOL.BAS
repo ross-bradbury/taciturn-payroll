@@ -1,3 +1,5 @@
+DECLARE SUB Time ()
+DECLARE SUB ScreenSaver ()
 DECLARE FUNCTION ShortString$ (Text AS STRING)
 'TEXTTOOL.BAS___________________________________________________________MODULE
 '                                                                 Version 1.00
@@ -62,7 +64,7 @@ END SUB
 'PARAMETERS
 '  y : First line to be cleared                                     -> INTEGER
 '  z : Last line to be cleared                                      -> INTEGER
-'                  
+'                 
 'OUTPUT
 '  Blank lines from line [y] to line [z]
 '
@@ -116,7 +118,7 @@ END SUB
 '  y     : New Mouse Y Coordinate                                   -> INTEGER
 '  Mb1   : TRUE if Left Mouse Button Pressed                        -> INTEGER
 '  Mb2   : TRUE if Right Mouse Button Pressed                       -> INTEGER
-'                                                                         
+'                                                                        
 FUNCTION GetKey$ (Flash)
   SHARED Pref AS INITIALS
   DIM s AS LONG
@@ -212,7 +214,7 @@ END FUNCTION
 '  Title$  : The Title of the screen                                -> STRING
 '  Company : Print Company name on first line if TRUE               -> INTEGER
 '  UseDate : Print date in top left corner if TRUE                  -> INTEGER
-'                
+'               
 'OUTPUT
 '  Header of 2 to 3 lines on thetop of the screen
 '
@@ -267,7 +269,7 @@ END SUB
 '  y      : Y Coordinate of starting point                          -> INTEGER
 '  x      : X Coordinate of starting point                          -> INTEGER
 '  Length : Length on the hilight                                   -> INTEGER
-'              
+'             
 'OUTPUT
 '  Highlighted Screen Text
 '
@@ -291,7 +293,7 @@ END SUB
 '
 'PARAMETERS
 '  Text : Text to find the length of                                -> STRING
-'          
+'         
 'VARIABLES
 '  i : Loop Counter                                                 -> INTEGER
 '  L : Temporary Length                                             -> INTEGER
@@ -314,7 +316,7 @@ END FUNCTION
 '
 'PARAMETERS
 '  Text : Text to find the length of                                -> STRING
-'            
+'           
 'VARIABLES
 '  i : Loop Counter                                                 -> INTEGER
 '  L : Temporary Length                                             -> INTEGER

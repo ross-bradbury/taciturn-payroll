@@ -105,7 +105,9 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.43  (01-15-2006)"
+CONST Version$ = "2.44  (02-04-2007)"
+'New in v2.44: 2007 Federal Tax Codes (02-04-2007), Publication 15
+'              2007 Ohio State Tax Codes (02-04-2007)
 'New in v2.43: 2006 Federal Tax Codes (01-15-2006), Publication 15
 '              2006 Ohio State Tax Codes (01-15-2006)
 'New in v2.42: 2005 Federal Tax Codes (01-09-2005), Publication 15
@@ -335,11 +337,12 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     'wages are above the limit, and then check to see if this is the pay
     'period that puts is above the limit
 
+    ' 2007-02-04 - SSLimit increased to 97500 from 94200
     ' 2006-01-15 - SSLimit increased to 94200 from 90000
     ' 2005-01-09 - SSLimit increased to 90000 from 87900
     ' 2004-02-20 - SSLimit increased to 87900 from 87000
     ' 2003-01-11 - SSLimit increased to 87000 from 84900
-    SSLimit = 94200
+    SSLimit = 97500
     IF P2.GrossYTD < SSLimit THEN
         'Still below the limit, take SS tax on all of it
         P2.Social = -Round(P2.Gross * .062, 2)
@@ -359,7 +362,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   P2.TotalDeduct = P2.TotalDeduct + P2.Social + P2.Medicare
  
   ' State Withholding -----------------------------------------Calculation--
-  CONST StateMultiplier = 1.547
+  CONST StateMultiplier = 1.412
 
 '  IF P2.Employee.OHAllowances = 15 THEN
   IF GlobalDeductionBonus = TRUE THEN
@@ -403,42 +406,42 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 63.46 * P2.Employee.USAllowances
+      tw = TaxableGross - 65.38 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 51
             P2.USWH = 0
-          CASE IS <= 192
+          CASE IS <= 195
             P2.USWH = ((tw - 51) * .1)
-          CASE IS <= 620
-            P2.USWH = (((tw - 192) * .15) + 14.1)
-          CASE IS <= 1409
-            P2.USWH = (((tw - 620) * .25) + 78.3)
-          CASE IS <= 3013
-            P2.USWH = (((tw - 1409) * .28) + 275.55)
-          CASE IS <= 6508
-            P2.USWH = (((tw - 3013) * .33) + 724.67)
-          CASE IS > 6508
-            P2.USWH = (((tw - 6508) * .35) + 1878.02)
+          CASE IS <= 645
+            P2.USWH = (((tw - 195) * .15) + 14.4)
+          CASE IS <= 1482
+            P2.USWH = (((tw - 645) * .25) + 81.9)
+          CASE IS <= 3131
+            P2.USWH = (((tw - 1482) * .28) + 291.15)
+          CASE IS <= 6763
+            P2.USWH = (((tw - 3131) * .33) + 752.87)
+          CASE IS > 6763
+            P2.USWH = (((tw - 6763) * .35) + 1951.43)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
           CASE IS <= 154
             P2.USWH = 0
-          CASE IS <= 440
+          CASE IS <= 449
             P2.USWH = ((tw - 154) * .1)
-          CASE IS <= 1308
-            P2.USWH = (((tw - 440) * .15) + 28.6)
-          CASE IS <= 2440
-            P2.USWH = (((tw - 1308) * .25) + 158.8)
-          CASE IS <= 3759
-            P2.USWH = (((tw - 2440) * .28) + 441.8)
-          CASE IS <= 6607
-            P2.USWH = (((tw - 3759) * .33) + 811.12)
-          CASE IS > 6607
-            P2.USWH = (((tw - 6607) * .35) + 1750.96)
+          CASE IS <= 1360
+            P2.USWH = (((tw - 449) * .15) + 29.5)
+          CASE IS <= 2573
+            P2.USWH = (((tw - 1360) * .25) + 166.15)
+          CASE IS <= 3907
+            P2.USWH = (((tw - 2573) * .28) + 469.4)
+          CASE IS <= 6865
+            P2.USWH = (((tw - 3907) * .33) + 842.92)
+          CASE IS > 6865
+            P2.USWH = (((tw - 6865) * .35) + 1819.06)
         END SELECT
       END IF
   END IF

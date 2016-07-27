@@ -1,3 +1,4 @@
+DECLARE SUB Bounce ()
 'SCRNSAVE.BAS___________________________________________________________MODULE
 '                                                                 Version 1.00
 '  SCRNSAVE.BI contains necessary declarations for insertion
