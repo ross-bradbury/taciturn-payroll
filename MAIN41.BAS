@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.40  (07-20-2003)"
+CONST Version$ = "2.41  (02-20-2004)"
+'New in v2.41: 2004 Federal Tax Codes (02-20-2004), Publication 15
 'New in v2.40: 2003 Federal Tax Codes (07-20-2003), Publication 15-T
 'New in v2.39: 2003 Federal Tax Codes (01-11-2003), new SSLimit, bonus mode
 ' reduced to 10% taxable gross for federal
@@ -330,8 +331,9 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     'wages are above the limit, and then check to see if this is the pay
     'period that puts is above the limit
 
+    ' 2004-02-20 - SSLimit increased to 87900 from 87000
     ' 2003-01-11 - SSLimit increased to 87000 from 84900
-    SSLimit = 87000
+    SSLimit = 87900
     IF P2.GrossYTD < SSLimit THEN
         'Still below the limit, take SS tax on all of it
         P2.Social = -Round(P2.Gross * .062, 2)
@@ -1126,7 +1128,7 @@ SUB OldRecords
   SHARED Pref AS INITIALS
   DIM EmployeeInfo AS EmployeeType
   DIM PayrollInfo AS PayrollType
-  DIM m$(53), m2$(3), w$(10)
+  DIM m$(53), m2$(3), w$(20)
 
   DO
     QuitNow = FALSE
