@@ -93,7 +93,7 @@ IF NOT Valid(Pref.Company) THEN
   Pref.OldAmounts = TRUE
 
   Pref.ShowNegative = FALSE
-  Pref.PrintDev = "LPT1:"
+  Pref.PrintDev = "CONPRINT.TXT"
   Pref.PrinterType = 0
   Pref.BackupDev = "A:"
  
@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.48  (01-09-2011)"
+CONST Version$ = "2.49  (12-27-2011)"
+'New in v2.49: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
 'New in v2.48: 2011 4.2% social security & Federal Tax Codes (Dec 29, 2010 http://www.irs.gov/pub/irs-pdf/p15.pdf
 'New in v2.47: 2009 Federal Tax Codes (04-11-2009), Publication 15-T (03-02-2009)
 'New in v2.46: 2009 Federal Tax Codes (01-11-2009), Publication 15
@@ -1739,7 +1740,8 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
      
       PRINT #m, EOn;
       PRINT #f, P.Employee.Note;
-      PRINT #m, EOff
+      PRINT #m, EOff;
+      PRINT #f, ""
       PRINT #f, " "; P.Employee.EmpName
       PRINT #f, " "; P.Employee.Address
       PRINT #f, " "; ShortString(P.Employee.Town); ", "; P.Employee.State; " "; P.Employee.Zip;
@@ -1758,6 +1760,11 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
   END IF
 
   CLOSE f
+
+  IF UCASE$(ShortString(Pref.PrintDev)) = "CONPRINT.TXT" THEN
+    SHELL "CONPRINT.EXE CONPRINT.TXT"
+    SHELL "DEL CONPRINT.TXT"
+  END IF
 
   StopPrint = FALSE
 
