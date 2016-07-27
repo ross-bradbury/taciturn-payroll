@@ -153,10 +153,6 @@ END SUB
 SUB TextBounce (ChangeModes)
   SHARED Rows, Pref AS INITIALS
 
-  ' Save old Mouse Position
-  CALL MousePosition(Oy, Ox, 1)
-  CALL MouseLocate(10, 10, 1)
- 
   IF ChangeModes THEN
     ' Determine maximum rows of text than can be displayed
     ON ERROR GOTO TextScreenError
@@ -205,10 +201,6 @@ SUB TextBounce (ChangeModes)
         COLOR 0
     END SELECT
     DO
-      CALL MousePosition(My, Mx, 1)
-      Mp = ABS(My - 10) + ABS(Mx - 10)
-      CALL MouseClick(Mb, 0, Mb)
-     
       i = i + 1
       LOCATE INT(RND(1) * Rows) + 1, INT(RND(1) * 80) + 1
       PRINT CHR$(219);
@@ -218,14 +210,13 @@ SUB TextBounce (ChangeModes)
       DO
         W = W + 1
       LOOP UNTIL W >= Warp
-    LOOP WHILE i < 80 * Rows * 1.15 AND a$ = "" AND Mp = 0 AND Mb = 0 AND Shift = PEEK(&H417)
-  LOOP WHILE a$ = "" AND Mp = 0 AND Mb = 0 AND Shift = PEEK(&H417)
+    LOOP WHILE i < 80 * Rows * 1.15 AND a$ = "" AND Shift = PEEK(&H417)
+  LOOP WHILE a$ = "" AND Shift = PEEK(&H417)
 
   SCREEN 0, 1, 0, 0
   COLOR Pref.Fore, Pref.Back
  
   IF ABS(PEEK(&H417) - Shift) > 8 THEN POKE &H417, Shift
-  CALL MouseLocate(Oy, Ox, 1)
 
 END SUB
 

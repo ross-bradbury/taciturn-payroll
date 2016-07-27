@@ -4,7 +4,6 @@
 '
 'REQUIRED MODULES
 '  MODULE SCRNSAVE.BAS
-'  LIBRARY Q4T
 
 DEFINT A-Z
 DECLARE SUB AutoPause (Length AS SINGLE)
@@ -80,7 +79,6 @@ SUB Pause (Alert)
   s = INT(TIMER)
 
   DO
-'    CALL MouseClick(Left, 0, Right)
     a$ = INKEY$
     IF NOT Alert THEN CALL Time
     'Engage screen saver if delay has elapsed or Alt+s entered

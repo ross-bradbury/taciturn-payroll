@@ -8,7 +8,6 @@ DECLARE FUNCTION ShortString$ (Text AS STRING)
 'REQUIRES
 '  MODULE SCRNSAVE.BAS
 '  MODULE TIMETOOL.BAS
-'  LIBRARY Q4T
 
 DEFINT A-Z
 DECLARE SUB Center (Row%, Text$, Fore%, Back%)
@@ -82,7 +81,7 @@ SUB ClearLine (y, z)
 END SUB
 
 'GetKey_______________________________________________________________FUNCTION
-'  Calls Time SUB and returns key press or mouse use
+'  Calls Time SUB and returns key press
 '  Runs Screen Saver after Pref.SSTimeOut min. or when 'Alt' + 's' is Pressed
 '
 'USES
@@ -91,10 +90,6 @@ END SUB
 '
 '
 '  SUB ScreenSaver   IN SCRNSAVE.BAS
-'  SUB MouseClick    IN Q4T.QLB
-'  SUB MouseLocate   IN Q4T.QLB
-'  SUB MousePosition IN Q4T.QLB
-'  SUB MouseStatus   IN Q4T.QLB
 '  SHARED Pref AS INITIALS
 '
 'PARAMETERS
@@ -112,12 +107,6 @@ END SUB
 '  L     : Line cursor was on                                       -> INTEGER
 '  P     : Column cursor was on                                     -> INTEGER
 '  s     : Number of seconds since GetKey was called                -> LONG
-'  ox    : Old Mouse X Coordinate                                   -> INTEGER
-'  oy    : Old Mouse Y Coordinate                                   -> INTEGER
-'  x     : New Mouse X Coordinate                                   -> INTEGER
-'  y     : New Mouse Y Coordinate                                   -> INTEGER
-'  Mb1   : TRUE if Left Mouse Button Pressed                        -> INTEGER
-'  Mb2   : TRUE if Right Mouse Button Pressed                       -> INTEGER
 '                                                                        
 FUNCTION GetKey$ (Flash)
   SHARED Pref AS INITIALS
@@ -125,13 +114,8 @@ FUNCTION GetKey$ (Flash)
   STATIC Share AS SINGLE
   STATIC ShareStage
 
-  CALL MouseStatus(Mouse)
   y = 12
   x = 40
-  ' Save old mouse position
-  IF Mouse THEN CALL MousePosition(oy, ox, 1)
-  ' Set mouse to center of screen
-  IF Mouse THEN CALL MouseLocate(y, x, 1)
 
   L = CSRLIN
   P = POS(0)
@@ -139,8 +123,6 @@ FUNCTION GetKey$ (Flash)
   s = INT(TIMER)
 
   DO
-    IF Mouse THEN CALL MousePosition(y, x, 1)
-    IF Mouse THEN CALL MouseClick(Mb1, 0, Mb2)
     a$ = INKEY$
     IF ShareStage = 0 THEN CALL Time
    
@@ -179,7 +161,7 @@ FUNCTION GetKey$ (Flash)
     ELSE
       LOCATE L, P, 0
     END IF
-  LOOP UNTIL a$ <> "" OR ABS(12 - y) > 2 OR ABS(40 - x) > 2 OR Mb1 OR Mb2
+  LOOP UNTIL a$ <> "" OR ABS(12 - y) > 2 OR ABS(40 - x) > 2
   
   IF a$ = "" THEN
     IF y > 12 THEN
@@ -193,13 +175,9 @@ FUNCTION GetKey$ (Flash)
         a$ = CHR$(0) + "K"    'LEFT
       END IF
     END IF
-    IF Mb1 THEN a$ = CHR$(13) 'ENTER
-    IF Mb2 THEN a$ = CHR$(27) 'Esc
   END IF
 
   GetKey$ = a$
-  ' Put mouse back
-  IF Mouse THEN CALL MouseLocate(oy, ox, 1)
 
 END FUNCTION
 

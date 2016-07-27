@@ -417,7 +417,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 75.00 * P2.Employee.USAllowances
+      tw = TaxableGross - 75! * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
@@ -426,11 +426,11 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 214
             P2.USWH = ((tw - 42) * .1)
           CASE IS <= 739
-            P2.USWH = (((tw - 214) * .15) + 17.20)
+            P2.USWH = (((tw - 214) * .15) + 17.2)
           CASE IS <= 1732
             P2.USWH = (((tw - 739) * .25) + 95.95)
           CASE IS <= 3566
-            P2.USWH = (((tw - 1732) * .28) + 344.20)
+            P2.USWH = (((tw - 1732) * .28) + 344.2)
           CASE IS <= 7703
             P2.USWH = (((tw - 3566) * .33) + 857.72)
            CASE IS <= 7735
@@ -446,17 +446,17 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 503
             P2.USWH = ((tw - 160) * .1)
           CASE IS <= 1554
-            P2.USWH = (((tw - 503) * .15) + 34.30)
+            P2.USWH = (((tw - 503) * .15) + 34.3)
           CASE IS <= 2975
             P2.USWH = (((tw - 1554) * .25) + 191.95)
           CASE IS <= 4449
-            P2.USWH = (((tw - 2975) * .28) + 547.20)
+            P2.USWH = (((tw - 2975) * .28) + 547.2)
           CASE IS <= 7820
             P2.USWH = (((tw - 4449) * .33) + 959.92)
           CASE IS <= 8813
             P2.USWH = (((tw - 7820) * .35) + 2072.35)
           CASE IS > 8813
-            P2.USWH = (((tw - 8813) * .396) + 2419.90)
+            P2.USWH = (((tw - 8813) * .396) + 2419.9)
         END SELECT
       END IF
   END IF

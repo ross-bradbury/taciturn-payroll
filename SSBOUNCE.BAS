@@ -62,10 +62,6 @@ SUB Bounce
   DIM C(ABS(SGN(Pref.SSCubes)) * Pref.SSPoints OR 1)
   DIM Count(ABS(SGN(Pref.SSCubes)) * Pref.SSPoints OR 1)
  
-  ' Save old Mouse Position
-  CALL MousePosition(oy, ox, 1)
-  CALL MouseLocate(10, 10, 1)
- 
   ' Initialize Screen
   CALL Bounce.Screen(XMax, YMax, CMax)
   XMin = 0
@@ -110,10 +106,6 @@ SUB Bounce
 	  END IF
 	NEXT
 	DO
-	  CALL MousePosition(My, Mx, 1)
-	  Mp = ABS(My - 10) + ABS(Mx - 10)
-	  CALL MouseClick(Mb, 0, Mb)
-
 	  ' Advance poly-line or cube
 	  FOR i = 1 TO Pref.SSPoints
 		Hit = Bounce.Advance(x(i, p), x(i, o), XAdd(i), XMin, XMax)
@@ -183,12 +175,11 @@ SUB Bounce
 		W = W + 1
 	  LOOP UNTIL W >= Warp
 	 
-	LOOP WHILE INKEY$ = "" AND Mp = 0 AND Mb = 0 AND Shift = PEEK(&H417)
+	LOOP WHILE INKEY$ = "" AND Shift = PEEK(&H417)
   ELSE
 	' If no graphics capability, display standard text Bounce
 	CALL TextBounce(TRUE)
   END IF
-  CALL MouseLocate(oy, ox, 1)
   IF ABS(PEEK(&H417) - Shift) > 8 THEN POKE &H417, Shift
 
 END SUB
