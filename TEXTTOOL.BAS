@@ -1,5 +1,4 @@
 DECLARE SUB Time ()
-DECLARE SUB ScreenSaver ()
 DECLARE FUNCTION ShortString$ (Text AS STRING)
 'TEXTTOOL.BAS___________________________________________________________MODULE
 '                                                                 Version 1.00
@@ -89,7 +88,6 @@ END SUB
 '
 '
 '
-'  SUB ScreenSaver   IN SCRNSAVE.BAS
 '  SHARED Pref AS INITIALS
 '
 'PARAMETERS
@@ -106,13 +104,9 @@ END SUB
 '  a$    : Temporary variable to determine if a key was pressed     -> STRING
 '  L     : Line cursor was on                                       -> INTEGER
 '  P     : Column cursor was on                                     -> INTEGER
-'  s     : Number of seconds since GetKey was called                -> LONG
 '                                                                        
 FUNCTION GetKey$ (Flash)
   SHARED Pref AS INITIALS
-  DIM s AS LONG
-  STATIC Share AS SINGLE
-  STATIC ShareStage
 
   y = 12
   x = 40
@@ -120,42 +114,11 @@ FUNCTION GetKey$ (Flash)
   L = CSRLIN
   P = POS(0)
   COLOR Pref.Fore, Pref.Back
-  s = INT(TIMER)
 
   DO
     a$ = INKEY$
-    IF ShareStage = 0 THEN CALL Time
+    CALL Time
    
-    'Engage screen saver if delay has elapsed or Alt+s entered
-    IF TIMER > s + (Pref.SSTimeOut * 60) AND Pref.SSActive OR a$ = CHR$(0) + CHR$(31) THEN
-      CALL ScreenSaver
-      s = INT(TIMER)
-      a$ = ""
-    END IF
-
-'    ' ShareWare Version ONLY
-'    IF TIMER > Share THEN
-'      Share = TIMER + .5
-'      ShareStage = ShareStage + 1
-'      LOCATE 1, 70
-'      COLOR 14, 4
-'      SELECT CASE ShareStage
-'        CASE 1 TO 15
-'          READ Message$
-'          PRINT Message$
-'        CASE 16
-'          READ Message$
-'          PRINT Message$
-'          RESTORE
-'        CASE 17
-'          ShareStage = 0
-'          Share = TIMER + 15
-'      END SELECT
-'      COLOR Pref.Fore, Pref.Back
-'    END IF
-
-
-
     IF Flash THEN
       LOCATE L, P, 1
     ELSE

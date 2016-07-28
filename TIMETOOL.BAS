@@ -55,7 +55,6 @@ END SUB
 'USES
 '  SUB Pause.Alert
 '  SUB Time
-'  SUB ScreenSaver
 '
 'PARAMETERS
 '  Alert : Alert user to press a key in place of time               -> BOOLEAN
@@ -83,7 +82,6 @@ SUB Pause (Alert)
     IF NOT Alert THEN CALL Time
     'Engage screen saver if delay has elapsed or Alt+s entered
     IF TIMER > s + (2 * 60) OR a$ = CHR$(0) + CHR$(31) THEN
-'      CALL ScreenSaver
       s = INT(TIMER)
       a$ = ""
       IF Alert THEN CALL Pause.Alert

@@ -6,7 +6,6 @@ DECLARE SUB HighLight (y%, x%, Length%)
 DECLARE SUB PleaseWait ()
 DECLARE SUB Pause (Alert%)
 DECLARE SUB Hint (H$)
-DECLARE SUB Bounce.Pref ()
 DECLARE SUB RememberScreen (Opt%, Page%, y1%, x1%, y2%, x2%)
 DECLARE SUB BackupSetup ()
 DECLARE SUB BackupSetup.Update (x%, y%)
@@ -37,13 +36,11 @@ DECLARE SUB EmployeeSetup ()
 DECLARE SUB LoadEmployeeData (Number%, Info AS ANY)
 
 '$INCLUDE: 'INITIALS.BI'
-'$INCLUDE: 'CAPSLOCK.BI'
 '$INCLUDE: 'EDNUMBER.BI'
 '$INCLUDE: 'EDSTRING.BI'
 '$INCLUDE: 'HELPTOOL.BI'
 '$INCLUDE: 'MENUTOOL.BI'
 '$INCLUDE: 'SCRNSAVE.BI'
-'$INCLUDE: 'SSBOUNCE.BI'
 '$INCLUDE: 'TEXTTOOL.BI'
 '$INCLUDE: 'TIMETOOL.BI'
 
@@ -2175,7 +2172,7 @@ SUB Setup
   DIM m$(1 TO 6)
 
   m$(1) = "1~Printing"
-  m$(2) = "2~Screen Saver"
+  m$(2) = "2~Nothing"
   m$(3) = "3~System Date/Time"
   m$(4) = "4~Backup/Restore"
   IF GlobalDeductionBonus = TRUE THEN
@@ -2189,7 +2186,7 @@ SUB Setup
       CASE "1"
         CALL PrintSetup
       CASE "2"
-        CALL Bounce.Pref
+        ' was screensaver
       CASE "3"
         CALL DateAndTime
       CASE "4"
