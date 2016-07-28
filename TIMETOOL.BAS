@@ -11,14 +11,13 @@ DECLARE SUB Click ()
 DECLARE SUB Pause (Alert%)
 DECLARE SUB Pause.Alert ()
 DECLARE SUB PleaseWait ()
-DECLARE SUB Time ()
 DECLARE FUNCTION Rand% (Min%, Max%)
 
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
-''$INCLUDE: 'SCRNSAVE.BI'
-'$INCLUDE: 'INITIALS.BI'
+''$INC_LUDE: 'SCRNSAVE.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 'AutoPause_________________________________________________________________SUB
 '  Waits for specified number of seconds (max accuracy is .01 sec)
@@ -45,7 +44,7 @@ END SUB
 '
 SUB Click
 
-  SOUND 3500, .1
+  'SOUND 3500, .1
 
 END SUB
 
@@ -54,7 +53,7 @@ END SUB
 '
 'USES
 '  SUB Pause.Alert
-'  SUB Time
+'  SUB DisplayTime
 '
 'PARAMETERS
 '  Alert : Alert user to press a key in place of time               -> BOOLEAN
@@ -79,7 +78,7 @@ SUB Pause (Alert)
 
   DO
     a$ = INKEY$
-    IF NOT Alert THEN CALL Time
+    IF NOT Alert THEN CALL DisplayTime()
     'Engage screen saver if delay has elapsed or Alt+s entered
     IF TIMER > s + (2 * 60) OR a$ = CHR$(0) + CHR$(31) THEN
       s = INT(TIMER)
@@ -104,7 +103,7 @@ END SUB
 '  P : Column cursor was on                                         -> INTEGER
 '
 SUB Pause.Alert
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   
   L = CSRLIN
   P = POS(0)
@@ -130,7 +129,7 @@ END SUB
 '  P : Column cursor was on                                         -> INTEGER
 '
 SUB PleaseWait
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   L = CSRLIN
   P = POS(0)
@@ -171,8 +170,8 @@ END FUNCTION
 '  t$    : Formatted time                                           -> STRING
 '  Time1 : Number of seconds past Midnight                          -> LONG
 '
-SUB Time STATIC
-  SHARED Pref AS INITIALS
+SUB DisplayTime() STATIC
+''''  SHARED Pref AS INITIALS
   DIM Time1 AS LONG
 
   L = CSRLIN

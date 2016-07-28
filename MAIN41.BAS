@@ -1,3 +1,5 @@
+ï»¿DEFINT A-Z
+DECLARE FUNCTION GetKey$ (Flash)
 DECLARE SUB NewDisk ()
 DECLARE SUB ClearLine (y%, z%)
 DECLARE SUB Header (Title$, Company%, UseDate%)
@@ -14,7 +16,6 @@ DECLARE SUB OldRecords ()
 DECLARE SUB ChangeLastweek (INI AS ANY)
 DECLARE SUB Payroll (INI AS ANY)
 DECLARE FUNCTION Quit% (INI AS ANY)
-DEFINT A-Z
 DECLARE SUB DateAndTime ()
 DECLARE SUB Disk ()
 DECLARE SUB GetInputs (Old AS ANY, P AS ANY, Deductions() AS SINGLE)
@@ -38,17 +39,18 @@ DECLARE SUB LoadEmployeeData (Number%, Info AS ANY)
 '$INCLUDE: 'INITIALS.BI'
 '$INCLUDE: 'EDNUMBER.BI'
 '$INCLUDE: 'EDSTRING.BI'
-'$INCLUDE: 'HELPTOOL.BI'
+'$INC_LUDE: 'HELPTOOL.BI'
 '$INCLUDE: 'MENUTOOL.BI'
-'$INCLUDE: 'SCRNSAVE.BI'
+'$INC_LUDE: 'SCRNSAVE.BI'
 '$INCLUDE: 'TEXTTOOL.BI'
-'$INCLUDE: 'TIMETOOL.BI'
+'$INC_LUDE: 'TIMETOOL.BI'
 
 '$INCLUDE: 'PAYTYPES.BI'
 
-COMMON SHARED GlobalDeductionBonus AS INTEGER
+DIM SHARED Pref AS INITIALS, Delete, NextFlag
+DIM SHARED GlobalDeductionBonus AS INTEGER
 
-CLEAR , , 13000
+'CLEAR , , 13000
 
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
@@ -102,7 +104,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.51  (09-14-2013)"
+Dim Version$
+Version$ = "2.51  (09-14-2013)"
 'New in v2.51 2013-09-14: Changed state witholding
 'New in v2.50 2013-01-05: 6.2% social security & federal tax codes from Notice 1036 (Rev. January 2013) http://www.irs.gov/pub/irs-pdf/n1036.pdf
 'New in v2.49 2011-12-27: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
@@ -150,6 +153,7 @@ PRINT "           "
   CLOSE
  
   ' Backup
+  Dim m$(1 to 2)
   m$(1) = "Y~Backup Files to " + LTRIM$(RTRIM$(Pref.BackupDev))
   m$(2) = "N~Skip Backup"
   a$ = Menu(13, 0, m$(), 2)
@@ -194,7 +198,7 @@ RESUME
 '      Creates a backup of all files in current directory
 '
 SUB Backup
-SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
  
   CALL Panel(1, Pref.Fore, Pref.Back, 1, 1, 25, 80, 0)
   CLS
@@ -217,7 +221,7 @@ SHARED Pref AS INITIALS
 END SUB
 
 SUB BackupSetup
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM m$(1 TO 2)
 
   x = 5
@@ -250,7 +254,7 @@ SUB BackupSetup
 END SUB
 
 SUB BackupSetup.Update (x, y)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   LOCATE y + 1, x
   PRINT "Drive and Directory for Backup/Restore : "; Pref.BackupDev
@@ -566,7 +570,7 @@ END SUB
 '              Change Last Period's Date
 '
 SUB ChangeLastweek (INI AS LastTime)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM OldINI AS LastTime
   DIM m$(1 TO 2)
 
@@ -601,7 +605,7 @@ SUB ChangeLastweek (INI AS LastTime)
     PRINT SPC(6); "Pressing any other key will abort.";
     a$ = GetKey(TRUE)
     IF a$ = CHR$(0) + CHR$(117) THEN
-      CALL Hint("Edit Week Number¯³ ENTER to Accept ³ Esc to Cancel")
+      CALL Hint("Edit Week NumberÂ¯Â³ ENTER to Accept Â³ Esc to Cancel")
       DO
         LOCATE 21, 1
         PRINT "Please enter the WEEK NUMBER for LAST period's entries.  The NEW"
@@ -767,11 +771,11 @@ SUB DeductionWarn (i, D AS DeductionType, PD() AS PayrollDeductionType, P2 AS Pa
   END IF
      
   IF ExceedLimit OR ExceedTotal OR ExceedNet THEN
-    SOUND 3500, 1
-    SOUND 32767, 1
-    SOUND 3500, 1
-    SOUND 32767, 1
-    SOUND 3500, 1
+    'SOUND 3500, 1
+    'SOUND 32767, 1
+    'SOUND 3500, 1
+    'SOUND 32767, 1
+    'SOUND 3500, 1
        
     l = LEN(Alert1$)
     IF l < LEN(Alert2$) THEN l = LEN(Alert2$)
@@ -782,7 +786,7 @@ SUB DeductionWarn (i, D AS DeductionType, PD() AS PayrollDeductionType, P2 AS Pa
     R = l + R + 3
 
     CALL Panel(1, 14, 4, 10, l, 20, R, 1)
-    CALL Center(10, "´ EXCESSIVE DEDUCTION Ã", 14, 4)
+    CALL Center(10, "Â´ EXCESSIVE DEDUCTION Ãƒ", 14, 4)
     COLOR 14, 4
     LOCATE 12, l + 2
     PRINT Alert1$
@@ -832,7 +836,7 @@ DEFINT A-Z
 '            Does NOT remove Employee Information file (Ref$).PAY
 '
 SUB DropEmployee
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM Info AS EmployeeType
   DIM TempInfo AS EmployeeType
 
@@ -865,11 +869,11 @@ SUB DropEmployee
     COLOR 14, Pref.Back
     PRINT a$
     IF a$ = "Y" THEN
-      SOUND 3500, 1
-      SOUND 32767, 1
-      SOUND 3500, 1
-      SOUND 32767, 1
-      SOUND 3500, 1
+      'SOUND 3500, 1
+      'SOUND 32767, 1
+      'SOUND 3500, 1
+      'SOUND 32767, 1
+      'SOUND 3500, 1
 
       LOCATE 16, 8
       PRINT "ERASING this Employee can not be undone, continue [Y/N] ? ";
@@ -884,26 +888,26 @@ SUB DropEmployee
         OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(Info)
           DO
             last = last + 1
-            GET 1, last, TempInfo
+            GET #1, last, TempInfo
           LOOP WHILE Valid(TempInfo.EmpName)
           IF Number = last - 1 THEN
-            GET 1, last, TempInfo
-            PUT 1, (last - 1), TempInfo
+            GET #1, last, TempInfo
+            PUT #1, (last - 1), TempInfo
           ELSEIF Number = 1 THEN
             FOR i = 1 TO last - 1
-              GET 1, i + 1, TempInfo
+              GET #1, i + 1, TempInfo
               TempInfo.Number = i
-              PUT 1, i, TempInfo
+              PUT #1, i, TempInfo
             NEXT
           ELSE
             FOR i = Number TO last - 1
-              GET 1, i + 1, TempInfo
+              GET #1, i + 1, TempInfo
               TempInfo.Number = i
-              PUT 1, i, TempInfo
+              PUT #1, i, TempInfo
             NEXT
           END IF
           TempInfo.EmpName = ""
-          PUT 1, last, TempInfo
+          PUT #1, last, TempInfo
         CLOSE 1
 
         LOCATE 18, 8
@@ -1047,7 +1051,7 @@ DEFINT A-Z
 '        Title And Main Menu for Entire Program
 '
 SUB MainMenu (Version$)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM INI(1 TO 2) AS LastTime
   DIM m$(8)
    
@@ -1122,7 +1126,7 @@ END SUB
 '      Creates a NEW BACKUP DISK
 '
 SUB NewDisk
-SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   CALL Panel(1, Pref.Fore, Pref.Back, 1, 1, 25, 80, 0)
   CLS
@@ -1148,15 +1152,16 @@ END SUB
 
 'OldRecords___________________________________________________________________
 SUB OldRecords
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM EmployeeInfo AS EmployeeType
   DIM PayrollInfo AS PayrollType
   DIM m$(53), m2$(3), w$(20)
-
+  DIM Copies AS Integer
+  
   DO
     QuitNow = FALSE
     CALL Header("Old Records", TRUE, TRUE)
-    CALL Hint("Choose an Employee ¯A '*' Indicates a Currently Inactive Employee")
+    CALL Hint("Choose an Employee Â¯A '*' Indicates a Currently Inactive Employee")
    
     CALL ChooseEmployee(Number, FALSE, FALSE, "")
  
@@ -1238,7 +1243,7 @@ SUB OldRecords
                   CALL Center(12, "Record has been Saved", Pref.Fore, Pref.Back)
                   LOCATE 14, 23
                   PRINT "Enter Number of Copies to Print: ";
-                  Copies = EditNum((Copies), 2, 0, FALSE)
+                  Copies = EditNum(CSNG(Copies), 2, 0, FALSE)
                              
                   ' Remove Panel
                   CALL Panel(2, Pref.Fore, Pref.Back, 11, 20, 16, 60, 3)
@@ -1263,13 +1268,13 @@ END SUB
 '       Begins the Payroll cycle for this week
 '
 SUB Payroll (SaveINI AS LastTime)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM m$(6)
   DIM INI(1 TO 2) AS LastTime
   DIM EmployeeInfo AS EmployeeType
-  DIM PayInfo(1 TO 2) AS PayrollType
+  REDIM PayInfo(1 TO 2) AS PayrollType
   DIM Deductions(1 TO 4) AS SINGLE
-  DIM DoneEmployees AS STRING * 20  ' 20 Employee Limit
+  DIM DoneEmployees AS STRING  ' 20 Employee Limit
   STATIC DateEntry AS LastTime
 
   ' Get Last End of Period date
@@ -1311,7 +1316,7 @@ SUB Payroll (SaveINI AS LastTime)
   Year$ = RIGHT$(INI(2).Period$, 2)
 
   ' Refresh Done Employees
-  DoneEmployees = STRING$(20, "0")
+  DoneEmployees = "00000000000000000000"
   CALL PleaseWait
   CALL Panel(1, 14, 4, 9, 20, 17, 60, 1)
   CALL Center(12, "Refreshing Employee Status", 14, 4)
@@ -1458,7 +1463,7 @@ SUB Payroll (SaveINI AS LastTime)
               CALL Center(12, "Record has been Saved", Pref.Fore, Pref.Back)
               LOCATE 14, 23
               PRINT "Enter Number of Copies to Print: ";
-              Copies = EditNum((Copies), 2, 0, FALSE)
+              Copies = EditNum(CSNG(Copies), 2, 0, FALSE)
             
               ' Remove Panel
               CALL Panel(2, Pref.Fore, Pref.Back, 11, 20, 16, 60, 3)
@@ -1507,7 +1512,7 @@ END SUB
 'Prints (x) copies of the Pay-Stub #2
 '
 SUB PrintPayStub (P AS PayrollType, Week, x)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   STATIC CopiesPrinted
   DIM D(1 TO 4) AS PayrollDeductionType
   DIM Taxable(1 TO 4) AS INTEGER
@@ -1773,7 +1778,7 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
 END SUB
 
 SUB PrintSetup
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM m$(1 TO 3)
 
   x = 16
@@ -1802,7 +1807,7 @@ SUB PrintSetup
         m$(1) = "1~Negative"
         m$(2) = "2~Positive"
         DO
-          CALL Hint("Press ENTER or Space to change,   or TAB for next field¯³ Esc when Done")
+          CALL Hint("Press ENTER or Space to change,   or TAB for next fieldÂ¯Â³ Esc when Done")
 
           CALL HighLight(y + 1, x + 22, 8)
           a$ = GetKey(FALSE)
@@ -1823,7 +1828,7 @@ SUB PrintSetup
         m$(2) = "2~Star 1000/1001"
         m$(3) = "3~HP Laserjet II Compatible"
         DO
-          CALL Hint("Press ENTER or Space to change,   or TAB for next field¯³ Esc when Done")
+          CALL Hint("Press ENTER or Space to change,   or TAB for next fieldÂ¯Â³ Esc when Done")
 
           CALL HighLight(y + 2, x + 22, 25)
           a$ = GetKey(FALSE)
@@ -1843,7 +1848,7 @@ SUB PrintSetup
 END SUB
 
 SUB PrintSetup.Update (x, y)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   LOCATE y, x
   PRINT "    Print Output To : "; Pref.PrintDev
@@ -1870,7 +1875,7 @@ FUNCTION Quit (INI AS LastTime)
   DIM m$(3)
   DIM OldINI AS LastTime
   DIM EmployeeInfo AS EmployeeType
-  DIM PayInfo(0 TO 1) AS PayrollType
+  REDIM PayInfo(0 TO 1) AS PayrollType
   DO
     IF INI.Week < 0 THEN
       m$(1) = "1~Exit Payroll! and Close Pay Period"
@@ -2023,7 +2028,7 @@ END FUNCTION
 'Displays Paystub
 '
 SUB ScreenDisplay (P AS PayrollType)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM D(1 TO 4) AS DeductionType
   DIM PD(1 TO 4) AS PayrollDeductionType
  
@@ -2046,7 +2051,7 @@ SUB ScreenDisplay (P AS PayrollType)
      LOCATE 7, 3
      PRINT "Seven Days"
      LOCATE 7, 21
-     PRINT "ÄÄÄÄÄ"
+     PRINT "Ã„Ã„Ã„Ã„Ã„"
      LOCATE 7, 28
      PRINT USING "$$####.##"; P.RegularAMT
   CASE 1, 3
@@ -2125,7 +2130,7 @@ SUB ScreenDisplay (P AS PayrollType)
   LOCATE 18, 20
   PRINT USING "####.##"; P.HolYTDHRS
   LOCATE 19, 20
-  PRINT " ÄÄÄÄÄ"
+  PRINT " Ã„Ã„Ã„Ã„Ã„"
   LOCATE 15, 28
   PRINT USING "$$####.##"; P.RegYTDAMT
   LOCATE 16, 28
@@ -2207,7 +2212,7 @@ SUB Setup
 END SUB
 
 SUB Template (Period AS STRING, Week, Employee AS EmployeeType)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   'Template_____________________________________________________________________
   CLS
@@ -2220,23 +2225,23 @@ SUB Template (Period AS STRING, Week, Employee AS EmployeeType)
     PRINT Week
   COLOR Pref.Fore
   PRINT "Gross Pay "; TAB(27); "Total Deductions "; TAB(64); "Net Pay "
-  PRINT "ÉÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍÍÍËÍÍÍÍÍÍÍÍÍ»";
-  PRINT "º Source of Gross º Units º Amounts º   Distributions    º   Y T D   º Current º";
-  PRINT "ÌÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍÍÍÎÍÍÍÍÍÍÍÍÍ¹";
-  PRINT "º                 º       º         º Gross Pay          º           º         º";
-  PRINT "º                 º       º         º Social Security    º           º         º";
-  PRINT "º                 º       º         º Medicare           º           º         º";
-  PRINT "º                 º       º         º U.S.Withholding TX º           º         º";
-  PRINT "º Bonus           º ÄÄÄÄÄ º         º Ohio in Tax        º           º         º";
-  PRINT "ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ×ÄÄÄÄÄÄÄ×ÄÄÄÄÄÄÄÄÄ¶                    º           º         º";
-  PRINT "º  Year to Date   º Units º Amounts º                    º           º         º";
-  PRINT "ÇÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄÄ×ÄÄÄÄÄÄÄ×ÄÄÄÄÄÄÄÄÄ¶                    º           º         º";
-  PRINT "º Regular  Hours  º       º         º                    º           º         º";
-  PRINT "º Overtime Hours  º       º         º                    º           º         º";
-  PRINT "º Vacation Hours  º       º         º Total Deductions   º           º         º";
-  PRINT "º Holiday  Hours  º       º         º Total Net Earnings º           º         º";
-  PRINT "º Bonus           º       º         º                    º           º         º";
-  PRINT "ÈÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍÍÍÊÍÍÍÍÍÍÍÍÍ¼";
+  PRINT "Ã‰ÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃ‹ÃÃÃÃÃÃÃÃ‹ÃÃÃÃÃÃÃÃÃÃ‹ÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃ‹ÃÃÃÃÃÃÃÃÃÃÃÃ‹ÃÃÃÃÃÃÃÃÃÂ»";
+  PRINT "Âº Source of Gross Âº Units Âº Amounts Âº   Distributions    Âº   Y T D   Âº Current Âº";
+  PRINT "ÃŒÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃŽÃÃÃÃÃÃÃÃŽÃÃÃÃÃÃÃÃÃÃŽÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃŽÃÃÃÃÃÃÃÃÃÃÃÃŽÃÃÃÃÃÃÃÃÃÂ¹";
+  PRINT "Âº                 Âº       Âº         Âº Gross Pay          Âº           Âº         Âº";
+  PRINT "Âº                 Âº       Âº         Âº Social Security    Âº           Âº         Âº";
+  PRINT "Âº                 Âº       Âº         Âº Medicare           Âº           Âº         Âº";
+  PRINT "Âº                 Âº       Âº         Âº U.S.Withholding TX Âº           Âº         Âº";
+  PRINT "Âº Bonus           Âº Ã„Ã„Ã„Ã„Ã„ Âº         Âº Ohio in Tax        Âº           Âº         Âº";
+  PRINT "Ã‡Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã—Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã—Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¶                    Âº           Âº         Âº";
+  PRINT "Âº  Year to Date   Âº Units Âº Amounts Âº                    Âº           Âº         Âº";
+  PRINT "Ã‡Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã—Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã—Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Ã„Â¶                    Âº           Âº         Âº";
+  PRINT "Âº Regular  Hours  Âº       Âº         Âº                    Âº           Âº         Âº";
+  PRINT "Âº Overtime Hours  Âº       Âº         Âº                    Âº           Âº         Âº";
+  PRINT "Âº Vacation Hours  Âº       Âº         Âº Total Deductions   Âº           Âº         Âº";
+  PRINT "Âº Holiday  Hours  Âº       Âº         Âº Total Net Earnings Âº           Âº         Âº";
+  PRINT "Âº Bonus           Âº       Âº         Âº                    Âº           Âº         Âº";
+  PRINT "ÃˆÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃŠÃÃÃÃÃÃÃÃŠÃÃÃÃÃÃÃÃÃÃŠÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃÃŠÃÃÃÃÃÃÃÃÃÃÃÃŠÃÃÃÃÃÃÃÃÃÂ¼";
   PRINT " *U.S. W/H = ";
     SELECT CASE Employee.USHolding
       CASE 1

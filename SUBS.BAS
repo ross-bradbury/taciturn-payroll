@@ -1,28 +1,28 @@
 DECLARE SUB Pause (Alert%)
 DECLARE SUB Hint (h$)
+DECLARE FUNCTION GetKey$ (Flash)
 'SUBS.BAS_______________________________________________________________MODULE
 '                                                                 Version 1.00
 
 DEFINT A-Z
 DECLARE FUNCTION ListSelection% (Choice%, m$(), Length%, NextField%)
 DECLARE SUB Click ()
-DECLARE SUB Time ()
 
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
 ' Define names similar to keyboard names with their equivalent key codes.
-CONST LEFT = 75, ESC = 27, SPACE = 32
+CONST LEFT_75 = 75, ESC = 27, SPACE_32 = 32
 CONST DOWN = 80, DEL = 83, ENTER = 13, UP = 72
-CONST HOME = 71, NULL = 0, RIGHT = 77, PgUp = 73
+CONST HOME = 71, NULL = 0, RIGHT_77 = 77, PgUp = 73
 CONST ENDK = 79, INS = 82, TABKEY = 9, PgDn = 81
 CONST CTRLD = 4, CTRLG = 7, CTRLS = 19, CTRLV = 22
 CONST CTRLE = 5, CTRLH = 8, CTRLX = 24, SHIFTTAB = 15
 CONST F1 = 59, F2 = 60, F3 = 61, F4 = 62, F5 = 63, F6 = 64
 CONST F7 = 65, F8 = 66, F9 = 67, F10 = 68
 
-'$INCLUDE: 'INITIALS.BI'
-'$INCLUDE: 'TEXTTOOL.BI'
+'$INC_LUDE: 'INITIALS.BI'
+'$INC_LUDE: 'TEXTTOOL.BI'
 
 ' Definitions of routines in other modules
 
@@ -32,7 +32,7 @@ DEFSNG A-Z
 '         Display a DOS Directory Page by Page, Sorted by Extension
 '
 'PROCEDURES USED
-'  SUB Time
+'  SUB DisplayTime
 '
 'OUTPUT
 '  Directory displayed on screen
@@ -50,7 +50,7 @@ END SUB
 
 DEFINT A-Z
 FUNCTION ListSelection (Choice, m$(), Length, NextField)
-SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 DIM L$(51), L(51)
 
 a$ = " "

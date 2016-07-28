@@ -4,30 +4,30 @@
 
 DEFINT A-Z
 DECLARE FUNCTION EditNum! (InNum AS SINGLE, Length1%, Length2%, NextField%)
+DECLARE FUNCTION GetKey$ (Flash)
 DECLARE FUNCTION Round! (Number AS SINGLE, Places%)
 
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
 ' Define names similar to keyboard names with their equivalent key codes.
-CONST LEFT = 75, ESC = 27, SPACE = 32
+CONST LEFT_75 = 75, ESC = 27, SPACE_32 = 32
 CONST DOWN = 80, DEL = 83, ENTER = 13, UP = 72
-CONST HOME = 71, NULL = 0, RIGHT = 77, PgUp = 73
+CONST HOME = 71, NULL = 0, RIGHT_77 = 77, PgUp = 73
 CONST ENDK = 79, INS = 82, TABKEY = 9, PgDn = 81
 CONST CTRLD = 4, CTRLG = 7, CTRLS = 19, CTRLV = 22
 CONST CTRLE = 5, CTRLH = 8, CTRLX = 24, SHIFTTAB = 15
 CONST F1 = 59, F2 = 60, F3 = 61, F4 = 62, F5 = 63, F6 = 64
 CONST F7 = 65, F8 = 66, F9 = 67, F10 = 68, F11 = 133, F12 = 134
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 ' Definitions of routines in other modules
 DECLARE SUB Click ()
-DECLARE FUNCTION GetKey$ (Flash%)
 
 'EditNum______________________________________________________________FUNCTION
 '  Creates or modifies a number of specified length with standard editing
-'  commands. LEFT, RIGHT, BKSP, DEL, INS, ESC, ENTER, TAB, SHIFTTAB, UP, DOWN
+'  commands. LEFT_75, RIGHT_77, BKSP, DEL, INS, ESC, ENTER, TAB, SHIFTTAB, UP, DOWN
 '  are all valid editing commands along with their CTRL key equivalents.
 '
 '  IMPORTANT: Although this FUNCTION usually returns a SINGLE precision real,
@@ -39,9 +39,9 @@ DECLARE FUNCTION GetKey$ (Flash%)
 '  FUNCTION GetKey
 '  SHARED Pref AS INITIALS
 '  CONST TRUE, FALSE
-'  CONST LEFT = 75, ESC = 27, SPACE = 32
+'  CONST LEFT_75 = 75, ESC = 27, SPACE_32 = 32
 '  CONST DOWN = 80, DEL = 83, ENTER = 13, UP = 72
-'  CONST HOME = 71, NULL = 0, RIGHT = 77, PgUp = 73
+'  CONST HOME = 71, NULL = 0, RIGHT_77 = 77, PgUp = 73
 '  CONST ENDK = 79, INS = 82, TABKEY = 9, PgDn = 81
 '  CONST CTRLD = 4, CTRLG = 7, CTRLS = 19, CTRLV = 22
 '  CONST CTRLD = 4, CTRLG = 7, CTRLS = 19, CTRLV = 22
@@ -79,8 +79,8 @@ DECLARE FUNCTION GetKey$ (Flash%)
 'LABELS
 '  StartEditNum
 '
-FUNCTION EditNum! (InNum AS SINGLE, Length1, Length2, NextField)
-  SHARED Pref AS INITIALS
+FUNCTION EditNum (InNum AS SINGLE, Length1 AS Integer, Length2 AS Integer, NextField AS Integer) as Single
+''''  SHARED Pref AS INITIALS
   STATIC Insert
   DIM Num$(1 TO 2), Length(1 TO 2)
 
@@ -148,9 +148,9 @@ StartEditNum:
       SELECT CASE Choice$
 
         ' Translate extended codes to ASCII control codes.
-        CASE CHR$(LEFT)
+        CASE CHR$(LEFT_75)
           Choice$ = CHR$(CTRLS)
-        CASE CHR$(RIGHT)
+        CASE CHR$(RIGHT_77)
           Choice$ = CHR$(CTRLD)
         CASE CHR$(INS)
           Choice$ = CHR$(CTRLV)
@@ -240,7 +240,7 @@ StartEditNum:
           GOTO StartEditNum
         END IF
 
-      ' CTRL+S or LEFT arrow moves cursor to left.
+      ' CTRL+S or LEFT_75 arrow moves cursor to left.
       CASE CTRLS
         IF P > 0 THEN
           P = P - 1
@@ -257,7 +257,7 @@ StartEditNum:
           Click
         END IF
 
-      ' CTRL+D or RIGHT arrow moves cursor to right.
+      ' CTRL+D or RIGHT_77 arrow moves cursor to right.
       CASE CTRLD
         IF P < MaxP THEN
           P = P + 1
@@ -422,7 +422,7 @@ StartEditNum:
   PRINT SPACE$(Length(1) - LEN(Num$(1))); Num$(1);
   IF Length(2) THEN PRINT "." + Num$(2) + STRING$(Length(2) - LEN(Num$(2)), "0");
    
-  EditNum! = VAL(Num$(1) + "." + Num$(2))
+  EditNum = VAL(Num$(1) + "." + Num$(2))
   LOCATE Row, Column
 
 END FUNCTION

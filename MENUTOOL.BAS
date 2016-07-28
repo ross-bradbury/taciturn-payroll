@@ -1,5 +1,6 @@
 '$INCLUDE: 'LINES.BI'
 
+DECLARE FUNCTION GetKey$ (Flash)
 DECLARE SUB LineMaker (n%, l AS LINES)
 DECLARE FUNCTION ConvertKey% (a$)
 DECLARE FUNCTION ListSelection% (Choice%, m$(), Length%, NextField%)
@@ -19,19 +20,18 @@ CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
 ' Define names similar to keyboard names with their equivalent key codes.
-CONST LEFT = 75, ESC = 27, SPACE = 32
+CONST LEFT_75 = 75, ESC = 27, SPACE_32 = 32
 CONST DOWN = 80, DEL = 83, ENTER = 13, UP = 72
-CONST HOME = 71, NULL = 0, RIGHT = 77, PgUp = 73
+CONST HOME = 71, NULL = 0, RIGHT_77 = 77, PgUp = 73
 CONST ENDK = 79, INS = 82, TABKEY = 9, PgDn = 81
 CONST CTRLD = 4, CTRLG = 7, CTRLS = 19, CTRLV = 22
 CONST CTRLE = 5, CTRLH = 8, CTRLX = 24, SHIFTTAB = 15
 CONST F1 = 59, F2 = 60, F3 = 61, F4 = 62, F5 = 63, F6 = 64
 CONST F7 = 65, F8 = 66, F9 = 67, F10 = 68
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 ' Definitions of routines in other modules
-DECLARE FUNCTION GetKey$ (Flash%)
 DECLARE SUB RememberScreen (Opt%, Page%, y1%, x1%, y2%, x2%)
 
 FUNCTION ConvertKey% (a$)
@@ -204,7 +204,7 @@ END SUB
 '  ValidKeys : List of keys that are valid choices                  -> STRING
 '
 FUNCTION Menu$ (Row, Offset, MenuDef() AS STRING, Last)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM ValidKeys AS STRING
 
 '  ValidKeys = ""
@@ -318,7 +318,7 @@ END FUNCTION
 '  Option$    : Option portion of [Full]                            -> INTEGER
 '
 SUB Menu.Format (Full AS STRING, MaxLength, VK$)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
       
   EntryStart = INSTR(Full, "~")
 
@@ -369,7 +369,7 @@ END SUB
 '  i : Loop counter                                                 -> INTEGER
 '
 SUB Menu.Highlight (k$, R, C, Row, CHeight, Last, Col, Columns, ColWidth, Max)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   ' Remove highlight from current selection
   COLOR Pref.MenuFore, Pref.MenuBack
@@ -408,7 +408,7 @@ SUB Menu.Highlight (k$, R, C, Row, CHeight, Last, Col, Columns, ColWidth, Max)
         WEND
         R = Row + Last - CHeight * (Columns - 1)
       END IF
-    CASE CHR$(0) + "M" 'RIGHT
+    CASE CHR$(0) + "M" 'RIGHT_77
       IF Col < Columns AND R - Row + CHeight * (Col) - 1 < Last THEN
         Col = Col + 1
         C = C + ColWidth
@@ -425,7 +425,7 @@ SUB Menu.Highlight (k$, R, C, Row, CHeight, Last, Col, Columns, ColWidth, Max)
         WEND
         R = Row + 1
       END IF
-    CASE CHR$(0) + "K" 'LEFT
+    CASE CHR$(0) + "K" 'LEFT_75
       IF Col > 1 THEN
         Col = Col - 1
         C = C - ColWidth
@@ -527,7 +527,7 @@ FUNCTION Menu.Valid (Key$, ValidKeys AS STRING)
 END FUNCTION
 
 SUB Panel (Opt, Fore, Back, y1, x1, y2, x2, n) STATIC
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM l AS LINES
  
   CALL LineMaker(n, l)

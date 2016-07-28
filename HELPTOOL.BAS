@@ -9,7 +9,7 @@ DECLARE SUB Hint (H$)
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 ' Definitions of routines in other modules
 DECLARE SUB ClearLine (y%, z%)
@@ -41,7 +41,7 @@ DECLARE SUB ClearLine (y%, z%)
 '  Split : True if hint is in two parts                             -> BOOLEAN
 '
 SUB Hint (H$)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   L = CSRLIN
   P = POS(0)
@@ -88,7 +88,7 @@ END SUB
 '  P     : Column cursor was on                                     -> INTEGER
 '
 SUB Pointer (y, x)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   L = CSRLIN
   P = POS(0)

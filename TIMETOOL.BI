@@ -4,6 +4,5 @@ DECLARE SUB AutoPause (Length AS SINGLE)
 DECLARE SUB Click ()
 DECLARE SUB Pause (Alert%)
 DECLARE SUB PleaseWait ()
-DECLARE SUB Time ()
 DECLARE FUNCTION Rand% (Min%, Max%)
 

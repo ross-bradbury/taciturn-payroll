@@ -33,17 +33,17 @@ DECLARE FUNCTION ConvertKey% (a$)
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
-'$INCLUDE: 'EDNUMBER.BI'
-'$INCLUDE: 'EDSTRING.BI'
-'$INCLUDE: 'HELPTOOL.BI'
-'$INCLUDE: 'MENUTOOL.BI'
-'$INCLUDE: 'SCRNSAVE.BI'
-'$INCLUDE: 'TEXTTOOL.BI'
-'$INCLUDE: 'TIMETOOL.BI'
+'$INC_LUDE: 'EDNUMBER.BI'
+'$INC_LUDE: 'EDSTRING.BI'
+'$INC_LUDE: 'HELPTOOL.BI'
+'$INC_LUDE: 'MENUTOOL.BI'
+'$INC_LUDE: 'SCRNSAVE.BI'
+'$INC_LUDE: 'TEXTTOOL.BI'
+'$INC_LUDE: 'TIMETOOL.BI'
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
-'$INCLUDE: 'PAYTYPES.BI'
+'$INC_LUDE: 'PAYTYPES.BI'
 
 DIM EmployeeInfo AS EmployeeType
 DIM Deduct       AS DeductionType
@@ -135,7 +135,7 @@ END SUB
 '          Creates Extra Deductions (up to 4) for Employees
 '
 FUNCTION Deductions (EmployeeInfo AS EmployeeType)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM Deduct(4) AS DeductionType
   DIM M$(5)
 
@@ -176,7 +176,7 @@ FUNCTION Deductions (EmployeeInfo AS EmployeeType)
 END FUNCTION
 
 FUNCTION Deductions.Delete (D AS DeductionType)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   CALL ClearLine(4, 25)
   COLOR 14, 4
@@ -199,11 +199,11 @@ FUNCTION Deductions.Delete (D AS DeductionType)
   COLOR 14
   PRINT a$
   IF a$ = "Y" THEN
-    SOUND 3500, 1
-    SOUND 32767, 1
-    SOUND 3500, 1
-    SOUND 32767, 1
-    SOUND 3500, 1
+    'SOUND 3500, 1
+    'SOUND 32767, 1
+    'SOUND 3500, 1
+    'SOUND 32767, 1
+    'SOUND 3500, 1
    
     LOCATE 11, 10
     PRINT "DELETING this deduction can not be undone, continue [Y/N] ? ";
@@ -234,7 +234,7 @@ FUNCTION Deductions.Delete (D AS DeductionType)
 END FUNCTION
 
 FUNCTION Deductions.Modify (Deduct AS DeductionType, Top)
-  SHARED Pref AS INITIALS, Delete, NextFlag
+''''  SHARED Pref AS INITIALS, Delete, NextFlag
   DIM Old AS DeductionType
   DIM M$(4)
 
@@ -434,7 +434,7 @@ FUNCTION Deductions.Modify (Deduct AS DeductionType, Top)
 END FUNCTION
 
 SUB Deductions.Update (Deduct AS DeductionType, Top)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM M$(4)
 
   LOCATE Top + 1, 1
@@ -525,7 +525,7 @@ END SUB
 '              Changes Employee Information
 '
 SUB Employee.Modify (New, EmployeeInfo AS EmployeeType)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM TempInfo AS EmployeeType
   DIM M$(4)
 
@@ -693,7 +693,7 @@ SUB Employee.Modify (New, EmployeeInfo AS EmployeeType)
       OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(EmployeeInfo)
         DO
           R = R + 1
-          GET 1, R, TempInfo
+          GET #1, R, TempInfo
         LOOP WHILE Valid(TempInfo.EmpName)
         Found = FALSE
         i = 0
@@ -748,7 +748,7 @@ SUB Employee.Modify (New, EmployeeInfo AS EmployeeType)
 END SUB
 
 SUB Employee.Update (Info AS EmployeeType, Top)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
               
   LOCATE Top + 1, 1
@@ -804,7 +804,7 @@ SUB Employee.Update (Info AS EmployeeType, Top)
 END SUB
 
 SUB EmployeeSetup
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM EmployeeInfo AS EmployeeType
   DIM M$(4)
 
@@ -849,7 +849,7 @@ SUB LoadEmployeeData (Number, Info AS EmployeeType)
 
   CALL PleaseWait
   OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(Info)
-    GET 1, Number, Info
+    GET #1, Number, Info
   CLOSE 1
  
 END SUB
@@ -885,7 +885,7 @@ SUB SaveEmployeeData (New, Info AS EmployeeType)
     OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(Info)
       DO
         R = R + 1
-        GET 1, R, TempInfo
+        GET #1, R, TempInfo
       LOOP WHILE Valid(TempInfo.EmpName)
       DO
         Found = FALSE
@@ -904,19 +904,19 @@ SUB SaveEmployeeData (New, Info AS EmployeeType)
     CLOSE 1
     Info.Number = R
     OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(Info)
-      GET 1, Info.Number, TempInfo
-      PUT 1, Info.Number + 1, TempInfo
+      GET #1, Info.Number, TempInfo
+      PUT #1, Info.Number + 1, TempInfo
     CLOSE 1
   END IF
 
   OPEN "EMPLOYEE.DAT" FOR RANDOM AS 1 LEN = LEN(Info)
-    PUT 1, Info.Number, Info
+    PUT #1, Info.Number, Info
   CLOSE 1
 
 END SUB
 
 SUB Status (D AS DeductionType, New)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
   DIM M$(4)
 
   IF New THEN

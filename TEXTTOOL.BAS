@@ -1,5 +1,3 @@
-DECLARE SUB Time ()
-DECLARE FUNCTION ShortString$ (Text AS STRING)
 'TEXTTOOL.BAS___________________________________________________________MODULE
 '                                                                 Version 1.00
 '  TEXTTOOL.BI contains necessary declarations for insertion
@@ -13,17 +11,19 @@ DECLARE SUB Center (Row%, Text$, Fore%, Back%)
 DECLARE SUB ClearLine (y%, z%)
 DECLARE SUB Header (Title$, Company%, UseDate%)
 DECLARE SUB HighLight (y%, x%, Length%)
-DECLARE FUNCTION GetKey$ (Flash%)
 DECLARE FUNCTION ShortString$ (Text AS STRING)
 DECLARE FUNCTION StringLength% (Text AS STRING)
+DECLARE SUB DisplayTime()
+
+DIM SHARED Pref AS INITIALS
 
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
-'$INCLUDE: 'TIMETOOL.BI'
-'$INCLUDE: 'SCRNSAVE.BI'
+'$INC_LUDE: 'TIMETOOL.BI'
+'$INC_LUDE: 'SCRNSAVE.BI'
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 DATA "  LIMITED  "," CAPACITY  "
 DATA " SHAREWARE ","  VERSION  ","  PLEASE   "," REGISTER  ","    TO     "
@@ -47,7 +47,7 @@ DATA "    OF     ","  PROGRAM  ","  UPDATES  "
 '  The string [Text$] centered on [Row] in COLOR [Fore, Back]
 '
 SUB Center (Row, Text$, Fore, Back)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   LOCATE Row, (80 - LEN(Text$)) \ 2
   COLOR Fore, Back
@@ -84,7 +84,7 @@ END SUB
 '  Runs Screen Saver after Pref.SSTimeOut min. or when 'Alt' + 's' is Pressed
 '
 'USES
-'  SUB Time          IN TIMETOOL.BAS
+'  SUB DisplayTime          IN TIMETOOL.BAS
 '
 '
 '
@@ -106,7 +106,7 @@ END SUB
 '  P     : Column cursor was on                                     -> INTEGER
 '                                                                        
 FUNCTION GetKey$ (Flash)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   y = 12
   x = 40
@@ -117,7 +117,7 @@ FUNCTION GetKey$ (Flash)
 
   DO
     a$ = INKEY$
-    CALL Time
+    CALL DisplayTime()
    
     IF Flash THEN
       LOCATE L, P, 1
@@ -133,9 +133,9 @@ FUNCTION GetKey$ (Flash)
       a$ = CHR$(0) + "H"      'UP
     ELSE
       IF x > 40 THEN
-        a$ = CHR$(0) + "M"    'RIGHT
+        a$ = CHR$(0) + "M"    'RIGHT_77
       ELSEIF x < 40 THEN
-        a$ = CHR$(0) + "K"    'LEFT
+        a$ = CHR$(0) + "K"    'LEFT_75
       END IF
     END IF
   END IF
@@ -149,7 +149,7 @@ END FUNCTION
 '
 'USES
 '  SHARED Pref AS INITIALS
-'  SUB Time IN TIMETOOL.BAS
+'  SUB DisplayTime IN TIMETOOL.BAS
 '
 'PARAMETERS
 '  Title$  : The Title of the screen                                -> STRING
@@ -164,7 +164,7 @@ END FUNCTION
 '  d$ : Converted Date                                              -> STRING
 '
 SUB Header (Title$, Company, UseDate)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   Title$ = ShortString(Title$)
   IF Company THEN
@@ -182,7 +182,7 @@ SUB Header (Title$, Company, UseDate)
       d$ = LEFT$(DATE$, 6) + RIGHT$(DATE$, 2)
     END IF
     PRINT d$;
-    CALL Time
+    CALL DisplayTime()
   END IF
   IF Company THEN
     LOCATE 1, (80 - StringLength(C$)) \ 2
@@ -218,7 +218,7 @@ END SUB
 '  i : Loop Counter                                                 -> INTEGER
 '
 SUB HighLight (y, x, Length)
-  SHARED Pref AS INITIALS
+''''  SHARED Pref AS INITIALS
 
   COLOR Pref.HiFore, Pref.HiBack
   FOR i = 0 TO Length - 1

@@ -8,7 +8,7 @@ DECLARE SUB RememberScreen (Opt%, Page%, y1%, x1%, y2%, x2%)
 CONST FALSE = 0
 CONST TRUE = NOT FALSE
 
-'$INCLUDE: 'INITIALS.BI'
+'$INC_LUDE: 'INITIALS.BI'
 
 'RememberScreen____________________________________________________________SUB
 '  "Remember" the Screen for Display After Screen-Saver
