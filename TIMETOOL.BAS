@@ -66,7 +66,7 @@ END SUB
 '  FALSE, 0 : Display current time
 '
 'OUTPUT
-'  SCREEN; Alert = TRUE  : Flashes "PRESS A KEY"   
+'  SCREEN; Alert = TRUE  : Flashes "PRESS A KEY"  
 '  SCREEN; Alert = FALSE : Displays current time in top right corner
 '
 'VARIABLES
@@ -188,7 +188,8 @@ SUB Time STATIC
     'Convert time to 12 hour format and add "AM" or "PM"
     t$ = TIME$
     IF LEFT$(t$, 2) > "12" THEN
-      t$ = STR$(VAL(LEFT$(t$, 2)) - 12) + MID$(t$, 3, 6) + " PM"
+      hoursAsInt = VAL(LEFT$(t$, 2)) + .1
+      t$ = STR$(hoursAsInt - 12) + MID$(t$, 3, 6) + " PM"
     ELSE
       t$ = t$ + " AM"
     END IF
