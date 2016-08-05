@@ -93,7 +93,7 @@ IF NOT Valid(Pref.Company) THEN
   Pref.OldAmounts = TRUE
 
   Pref.ShowNegative = FALSE
-  Pref.PrintDev = "CONPRINT.TXT"
+  Pref.PrintDev = "C:\SPOOL\[DATE].TXT"
   Pref.PrinterType = 0
   Pref.BackupDev = "A:"
  
@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.51  (09-14-2013)"
+CONST Version$ = "2.52  (2016-08-04)"
+'New in v2.52 2016-08-04: Support running under DOSBox SVN-Daum
 'New in v2.51 2013-09-14: Changed state witholding
 'New in v2.50 2013-01-05: 6.2% social security & federal tax codes from Notice 1036 (Rev. January 2013) http://www.irs.gov/pub/irs-pdf/n1036.pdf
 'New in v2.49 2011-12-27: Use CONPRINT.EXE for printing when printing to CONPRINT.TXT
@@ -417,7 +418,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 75.00 * P2.Employee.USAllowances
+      tw = TaxableGross - 75! * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
@@ -426,11 +427,11 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 214
             P2.USWH = ((tw - 42) * .1)
           CASE IS <= 739
-            P2.USWH = (((tw - 214) * .15) + 17.20)
+            P2.USWH = (((tw - 214) * .15) + 17.2)
           CASE IS <= 1732
             P2.USWH = (((tw - 739) * .25) + 95.95)
           CASE IS <= 3566
-            P2.USWH = (((tw - 1732) * .28) + 344.20)
+            P2.USWH = (((tw - 1732) * .28) + 344.2)
           CASE IS <= 7703
             P2.USWH = (((tw - 3566) * .33) + 857.72)
            CASE IS <= 7735
@@ -446,17 +447,17 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
           CASE IS <= 503
             P2.USWH = ((tw - 160) * .1)
           CASE IS <= 1554
-            P2.USWH = (((tw - 503) * .15) + 34.30)
+            P2.USWH = (((tw - 503) * .15) + 34.3)
           CASE IS <= 2975
             P2.USWH = (((tw - 1554) * .25) + 191.95)
           CASE IS <= 4449
-            P2.USWH = (((tw - 2975) * .28) + 547.20)
+            P2.USWH = (((tw - 2975) * .28) + 547.2)
           CASE IS <= 7820
             P2.USWH = (((tw - 4449) * .33) + 959.92)
           CASE IS <= 8813
             P2.USWH = (((tw - 7820) * .35) + 2072.35)
           CASE IS > 8813
-            P2.USWH = (((tw - 8813) * .396) + 2419.90)
+            P2.USWH = (((tw - 8813) * .396) + 2419.9)
         END SELECT
       END IF
   END IF
@@ -1172,15 +1173,20 @@ SUB OldRecords
       'This section added 12-24-1998 for selection of year of old records
       '********************************************************************
       last = 0
-      SHELL "dir " + EmployeeInfo.FileName + ".?? /b /oe > temp.txt"
+      SHELL "dir " + EmployeeInfo.FileName + ".?? > temp.txt"
       w = FREEFILE
       OPEN "temp.txt" FOR INPUT AS w
       wi = 1
       WHILE NOT EOF(w)
         LINE INPUT #w, wtemp$
-        wtemp$ = RIGHT$(wtemp$, 2)
-        last = last + 1
-        w$(last) = wtemp$ + "~Records for '" + wtemp$
+        nameIndex = INSTR(UCASE$(wtemp$), UCASE$(EmployeeInfo.FileName))
+        IF nameIndex THEN
+          wtemp$ = MID$(wtemp$, nameIndex + LEN(EmployeeInfo.FileName))
+          wtemp$ = LTRIM$(wtemp$)
+          wtemp$ = LEFT$(wtemp$, 2)
+          last = last + 1
+          w$(last) = wtemp$ + "~Records for '" + wtemp$
+        END IF
       WEND
       CLOSE w
       KILL "temp.txt"
@@ -1512,6 +1518,7 @@ END SUB
 SUB PrintPayStub (P AS PayrollType, Week, x)
   SHARED Pref AS INITIALS
   STATIC CopiesPrinted
+  STATIC spoolFileName$
   DIM D(1 TO 4) AS PayrollDeductionType
   DIM Taxable(1 TO 4) AS INTEGER
   DIM WH$(1 TO 2)
@@ -1572,7 +1579,19 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
   D(4) = P.Deduction4
 
   f = FREEFILE
-  OPEN ShortString(Pref.PrintDev) FOR OUTPUT AS f
+  IF UCASE$(ShortString(Pref.PrintDev)) = "C:\SPOOL\[DATE].TXT" THEN
+   
+    IF spoolFileName$ = "" THEN
+      spoolFileName$ = DATE$
+      ' Turn mm-dd-yyyy into yyyymmdd
+      spoolFileName$ = MID$(spoolFileName$, 7, 4) + MID$(spoolFileName$, 1, 2) + MID$(spoolFileName$, 4, 2)
+      spoolFileName$ = "C:\SPOOL\" + spoolFileName$ + ".TXT"
+    END IF
+
+    OPEN spoolFileName$ FOR APPEND AS f
+  ELSE
+    OPEN ShortString(Pref.PrintDev) FOR OUTPUT AS f
+  END IF
   WIDTH #f, 120
 
   IF UCASE$(LEFT$(ShortString(Pref.PrintDev), 3)) = "LPT" THEN
