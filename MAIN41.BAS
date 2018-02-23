@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.52  (2016-08-04)"
+CONST Version$ = "2.53  (2018-02-23)"
+'New in v2.53 2018-02-23: New witholding rates
 'New in v2.52 2016-08-04: Support running under DOSBox SVN-Daum
 'New in v2.51 2013-09-14: Changed state witholding
 'New in v2.50 2013-01-05: 6.2% social security & federal tax codes from Notice 1036 (Rev. January 2013) http://www.irs.gov/pub/irs-pdf/n1036.pdf
@@ -354,7 +355,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
     DIM SSRate AS DOUBLE
     SSRate = .062
     DIM SSLimit AS DOUBLE
-    SSLimit = 113700
+    SSLimit = 128400
     IF P2.GrossYTD < SSLimit THEN
         'Still below the limit, take SS tax on all of it
         P2.Social = -Round(P2.Gross * SSRate, 2)
@@ -374,7 +375,7 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
   P2.TotalDeduct = P2.TotalDeduct + P2.Social + P2.Medicare
  
   ' State Withholding -----------------------------------------Calculation--
-  CONST StateMultiplier = 1.161
+  CONST StateMultiplier = 1.112
 
 '  IF P2.Employee.OHAllowances = 15 THEN
   IF GlobalDeductionBonus = TRUE THEN
@@ -418,46 +419,46 @@ SUB Calculate (P1 AS PayrollType, Deductions() AS SINGLE, P2 AS PayrollType)
       P2.USWH = .1 * TaxableGross
 
   ELSE
-      tw = TaxableGross - 75! * P2.Employee.USAllowances
+      tw = TaxableGross - 79.8 * P2.Employee.USAllowances
       IF P2.Employee.USHolding = 1 THEN
         ' Single Employee -----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 42
+          CASE IS <= 71
             P2.USWH = 0
-          CASE IS <= 214
-            P2.USWH = ((tw - 42) * .1)
-          CASE IS <= 739
-            P2.USWH = (((tw - 214) * .15) + 17.2)
-          CASE IS <= 1732
-            P2.USWH = (((tw - 739) * .25) + 95.95)
-          CASE IS <= 3566
-            P2.USWH = (((tw - 1732) * .28) + 344.2)
-          CASE IS <= 7703
-            P2.USWH = (((tw - 3566) * .33) + 857.72)
-           CASE IS <= 7735
-            P2.USWH = (((tw - 7703) * .35) + 2222.93)
-           CASE IS > 7735
-            P2.USWH = (((tw - 7735) * .396) + 2234.13)
+          CASE IS <= 254
+            P2.USWH = ((tw - 71) * .1)
+          CASE IS <= 815
+            P2.USWH = (((tw - 254) * .12) + 18.3)
+          CASE IS <= 1658
+            P2.USWH = (((tw - 815) * .22) + 85.62)
+          CASE IS <= 3100
+            P2.USWH = (((tw - 1658) * .24) + 271.08)
+          CASE IS <= 3917
+            P2.USWH = (((tw - 3100) * .32) + 617.16)
+           CASE IS <= 9687
+            P2.USWH = (((tw - 3917) * .35) + 878.6)
+           CASE IS > 9687
+            P2.USWH = (((tw - 9687) * .37) + 2898.1)
         END SELECT
       ELSEIF P2.Employee.USHolding = 2 THEN
         ' Married Employee ----------------------------------------Calculation
         SELECT CASE tw
-          CASE IS <= 160
+          CASE IS <= 222
             P2.USWH = 0
-          CASE IS <= 503
-            P2.USWH = ((tw - 160) * .1)
-          CASE IS <= 1554
-            P2.USWH = (((tw - 503) * .15) + 34.3)
-          CASE IS <= 2975
-            P2.USWH = (((tw - 1554) * .25) + 191.95)
-          CASE IS <= 4449
-            P2.USWH = (((tw - 2975) * .28) + 547.2)
-          CASE IS <= 7820
-            P2.USWH = (((tw - 4449) * .33) + 959.92)
-          CASE IS <= 8813
-            P2.USWH = (((tw - 7820) * .35) + 2072.35)
-          CASE IS > 8813
-            P2.USWH = (((tw - 8813) * .396) + 2419.9)
+          CASE IS <= 588
+            P2.USWH = ((tw - 222) * .1)
+          CASE IS <= 1711
+            P2.USWH = (((tw - 588) * .12) + 36.6)
+          CASE IS <= 3395
+            P2.USWH = (((tw - 1711) * .22) + 171.36)
+          CASE IS <= 6280
+            P2.USWH = (((tw - 3395) * .24) + 541.84)
+          CASE IS <= 7914
+            P2.USWH = (((tw - 6280) * .32) + 1234.24)
+          CASE IS <= 11761
+            P2.USWH = (((tw - 7914) * .35) + 1757.12)
+          CASE IS > 11761
+            P2.USWH = (((tw - 11761) * .37) + 3103.57)
         END SELECT
       END IF
   END IF
