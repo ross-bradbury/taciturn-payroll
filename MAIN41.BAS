@@ -105,7 +105,8 @@ END IF
 Pref.Click = FALSE
 Pref.Entry = 15
 
-CONST Version$ = "2.53  (2018-02-23)"
+CONST Version$ = "2.54  (2018-03-09)"
+'New in v2.54 2018-03-09: Print out YTD paid time off hours
 'New in v2.53 2018-02-23: New witholding rates
 'New in v2.52 2016-08-04: Support running under DOSBox SVN-Daum
 'New in v2.51 2013-09-14: Changed state witholding
@@ -1709,9 +1710,17 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
        PRINT #f, "*"
           
       FOR i = 1 TO 4
-        IF Valid(D(i).DName) THEN
+        IF i = 1 THEN
           PRINT #f, "*                 *       *         * ";
-         
+        ELSEIF i = 2 THEN
+          PRINT #f, "************************************* ";
+        ELSEIF i = 3 THEN
+          PRINT #f, "* YEAR TO DATE            *  Units  * ";
+        ELSE
+          PRINT #f, "*-------------------------*---------* ";
+        END IF
+       
+        IF Valid(D(i).DName) THEN
           IF Taxable(i) = 2 THEN PRINT #m, IOn;
           PRINT #f, D(i).DName;
           IF Taxable(i) = 2 THEN PRINT #m, IOff;
@@ -1722,11 +1731,13 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
            PRINT #f, USING "$$####.##"; n * D(i).Amount;
            PRINT #f, "*"
         ELSE
-          PRINT #f, "*                 *       *         *                    *           *         *"
+          PRINT #f, "                   *           *         *"
         END IF
       NEXT
 
-      PRINT #f, "*                 *       *         * ";
+      PRINT #f, "* Vacation Hours YTD      *";
+       PRINT #f, USING "#####.##"; P.VacYTDHRS;
+       PRINT #f, " * ";
        PRINT #m, EOn;
        PRINT #f, "Total Deductions   ";
        PRINT #m, EOff;
@@ -1739,7 +1750,9 @@ SUB PrintPayStub (P AS PayrollType, Week, x)
        PRINT #f, USING "$$####.##"; n * P.TotalDeduct;
        PRINT #m, EOff;
        PRINT #f, "*"
-      PRINT #f, "*                 *       *         * ";
+      PRINT #f, "* Holiday Hours YTD       *";
+       PRINT #f, USING "#####.##"; P.HolYTDHRS;
+       PRINT #f, " * ";
        PRINT #m, EOn;
        PRINT #f, "Total Net Earnings ";
        PRINT #m, EOff;
